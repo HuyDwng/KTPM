@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.System_settingsController">
+
+    <!-- Header -->
+    <top>
+        <Label text="Cài đặt hệ thống" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" />
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="10">
+            <!-- Quản lý thời gian lưu log -->
+            <HBox spacing="10">
+                <Label text="Thời gian lưu log:" />
+                
+                <ComboBox fx:id="logRetention" />
+                
+                <TextField fx:id="customRetentionField" promptText="Nhập số ngày" disable="true"/>
+            </HBox>
+
+            <!-- Danh sách file sao lưu -->
+            <Label text="Danh sách file sao lưu:" />
+            <ListView fx:id="backupFilesList" prefHeight="150"/>
+
+        </VBox>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox spacing="10">
+            <Button fx:id="btnDownloadBackup" text="Tải file sao lưu" />
+            <Button fx:id="btnSaveSettings" text="Lưu cài đặt" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

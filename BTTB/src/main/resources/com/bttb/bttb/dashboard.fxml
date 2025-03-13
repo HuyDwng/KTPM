@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.DashboardController">
+    <!-- Sidebar Navigation -->
+    <left>
+        <VBox spacing="10" style="-fx-background-color: #2c3e50; -fx-padding: 10;">
+            <Button text="Quản lý thiết bị" fx:id="btnManageDevices" style="-fx-background-color: #34495e; -fx-text-fill: white;"/>
+            <Button text="Lịch bảo trì" fx:id="btnMaintenanceSchedule" style="-fx-background-color: #34495e; -fx-text-fill: white;"/>
+            <Button text="Lịch sử sửa chữa" fx:id="btnRepairHistory" style="-fx-background-color: #34495e; -fx-text-fill: white;"/>
+            <Button text="Lịch sử hoạt động" fx:id="btnActivityLog" style="-fx-background-color: #34495e; -fx-text-fill: white;"/>
+            <Button text="Cài đặt" fx:id="btnSettings" style="-fx-background-color: #34495e; -fx-text-fill: white;"/>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20" alignment="CENTER">
+            <Label text="Bảng Điều Khiển" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            
+            <HBox spacing="20" alignment="CENTER">
+                <VBox style="-fx-border-color: black; -fx-padding: 10; -fx-background-color: #ecf0f1;">
+                    <Label text="Thiết bị đang hoạt động" />
+                    <Label fx:id="activeDevicesCount" text="0" style="-fx-font-size: 18px;"/>
+                </VBox>
+                <VBox style="-fx-border-color: black; -fx-padding: 10; -fx-background-color: #ecf0f1;">
+                    <Label text="Thiết bị hỏng hóc" />
+                    <Label fx:id="brokenDevicesCount" text="0" style="-fx-font-size: 18px;"/>
+                </VBox>
+                <VBox style="-fx-border-color: black; -fx-padding: 10; -fx-background-color: #ecf0f1;">
+                    <Label text="Thiết bị đang sửa chữa" />
+                    <Label fx:id="repairingDevicesCount" text="0" style="-fx-font-size: 18px;"/>
+                </VBox>
+            </HBox>
+
+            <TableView fx:id="maintenanceScheduleTable">
+                <columns>
+                    <TableColumn text="Thiết bị" fx:id="colDeviceName"/>
+                    <TableColumn text="Ngày bảo trì" fx:id="colMaintenanceDate"/>
+                    <TableColumn text="Trạng thái" fx:id="colStatus"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

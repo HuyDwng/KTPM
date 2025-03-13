@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.Repair_historyController">
+
+    <!-- Header -->
+    <top>
+        <Label text="Lịch sử sửa chữa" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" />
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="10">
+            <!-- Bộ lọc tìm kiếm -->
+            <HBox spacing="10">
+                <Label text="Tìm theo thiết bị:" />
+                <ComboBox fx:id="deviceFilter" prefWidth="200"/>
+                <Label text="Từ ngày:" />
+                <DatePicker fx:id="startDatePicker"/>
+                <Label text="Đến ngày:" />
+                <DatePicker fx:id="endDatePicker"/>
+                <Button fx:id="btnSearch" text="Tìm kiếm" />
+            </HBox>
+
+            <!-- Bảng hiển thị lịch sử sửa chữa -->
+            <TableView fx:id="repairHistoryTable">
+                <columns>
+                    <TableColumn text="Mã thiết bị" fx:id="colDeviceId"/>
+                    <TableColumn text="Tên thiết bị" fx:id="colDeviceName"/>
+                    <TableColumn text="Thời gian sửa chữa" fx:id="colRepairDate"/>
+                    <TableColumn text="Người thực hiện" fx:id="colTechnician"/>
+                    <TableColumn text="Chi phí" fx:id="colCost"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+</BorderPane>

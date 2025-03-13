@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.Activity_logController">
+
+    <!-- Header -->
+    <top>
+        <Label text="Quản lý lịch sử hoạt động" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" />
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="10">
+            <!-- Bộ lọc tìm kiếm -->
+            <HBox spacing="10">
+                <Label text="Từ ngày:" />
+                <DatePicker fx:id="startDatePicker"/>
+                <Label text="Đến ngày:" />
+                <DatePicker fx:id="endDatePicker"/>
+                <Label text="Người thực hiện:" />
+                <ComboBox fx:id="userFilter" prefWidth="200"/>
+                <Label text="Loại hành động:" />
+                <ComboBox fx:id="actionFilter" prefWidth="200"/>
+                <Button fx:id="btnSearch" text="Tìm kiếm" />
+            </HBox>
+
+            <!-- Bảng hiển thị lịch sử hoạt động -->
+            <TableView fx:id="activityLogTable">
+                <columns>
+                    <TableColumn text="Thời gian" fx:id="colTimestamp"/>
+                    <TableColumn text="Người thực hiện" fx:id="colUser"/>
+                    <TableColumn text="Hành động" fx:id="colAction"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox spacing="10">
+            <Button fx:id="btnExportCSV" text="Xuất CSV" />
+            <Button fx:id="btnExportPDF" text="Xuất PDF" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

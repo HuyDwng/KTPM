@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.Maintenance_scheduleController">
+
+    <!-- Header -->
+    <top>
+        <Label text="Lập lịch bảo trì" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" />
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="10">
+            <!-- Chọn thiết bị -->
+            <HBox spacing="10">
+                <Label text="Chọn thiết bị:" />
+                <ComboBox fx:id="deviceComboBox" prefWidth="200"/>
+            </HBox>
+
+            <!-- Chọn ngày bảo trì -->
+            <HBox spacing="10">
+                <Label text="Chọn ngày:" />
+                <DatePicker fx:id="datePicker"/>
+            </HBox>
+
+            <!-- Chọn giờ bảo trì -->
+            <HBox spacing="10">
+                <Label text="Chọn giờ:" />
+                <ComboBox fx:id="hourComboBox" prefWidth="80"/>
+                <Label text=":" />
+                <ComboBox fx:id="minuteComboBox" prefWidth="80"/>
+            </HBox>
+
+            <!-- Cảnh báo trùng lịch -->
+            <Label fx:id="warningLabel" text="" style="-fx-text-fill: red;"/>
+
+        </VBox>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox spacing="10">
+            <Button fx:id="btnConfirm" text="Xác nhận" />
+            <Button fx:id="btnCancel" text="Hủy" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

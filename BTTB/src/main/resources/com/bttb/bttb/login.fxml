@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.LoginController">
+    <children>
+        <VBox alignment="CENTER" spacing="10" prefWidth="300" prefHeight="250">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Đăng nhập" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+            <TextField fx:id="usernameField" promptText="Tên người dùng" />
+            <PasswordField fx:id="passwordField" promptText="Mật khẩu" />
+            
+            <ComboBox fx:id="roleComboBox" />
+
+            <Button fx:id="loginButton" text="Đăng nhập" />
+            <Label fx:id="errorLabel" textFill="red" visible="false" />
+
+        </VBox>
+    </children>
+</AnchorPane>
+

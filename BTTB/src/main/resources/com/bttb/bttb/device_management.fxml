@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.Device_managementController">
+
+    <!-- Header -->
+    <top>
+        <HBox spacing="10">
+            <Label text="Quản lý thiết bị" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <TextField fx:id="searchField" promptText="Tìm kiếm thiết bị..." />
+            
+            <ComboBox fx:id="statusFilter" />
+            
+            <Button fx:id="btnSearch" text="Tìm kiếm" />
+        </HBox>
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <TableView fx:id="deviceTable">
+            <columns>
+                <TableColumn text="Mã thiết bị" fx:id="colDeviceId"/>
+                <TableColumn text="Tên thiết bị" fx:id="colDeviceName"/>
+                <TableColumn text="Trạng thái" fx:id="colStatus"/>
+                <TableColumn text="Vị trí" fx:id="colLocation"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox spacing="10">
+            <Button fx:id="btnAddDevice" text="Thêm thiết bị" />
+            <Button fx:id="btnUpdateStatus" text="Cập nhật trạng thái" />
+            <Button fx:id="btnDeleteDevice" text="Xóa thiết bị" />
+        </HBox>
+    </bottom>
+
+</BorderPane>
+
