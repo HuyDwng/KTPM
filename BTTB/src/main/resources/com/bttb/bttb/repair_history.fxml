@@ -1,41 +1,184 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.Repair_historyController">
+<BorderPane prefHeight="581.0" prefWidth="770.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.repairHistoryController">
 
     <!-- Header -->
     <top>
-        <Label text="Lịch sử sửa chữa" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" />
+        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" text="Quản lý lịch sử hoạt động" />
     </top>
 
     <!-- Main Content -->
     <center>
-        <VBox spacing="10">
-            <!-- Bộ lọc tìm kiếm -->
-            <HBox spacing="10">
-                <Label text="Tìm theo thiết bị:" />
-                <ComboBox fx:id="deviceFilter" prefWidth="200"/>
-                <Label text="Từ ngày:" />
-                <DatePicker fx:id="startDatePicker"/>
-                <Label text="Đến ngày:" />
-                <DatePicker fx:id="endDatePicker"/>
-                <Button fx:id="btnSearch" text="Tìm kiếm" />
-            </HBox>
+        <VBox prefHeight="507.0" prefWidth="770.0" spacing="10">
+            <TabPane prefHeight="320.0" prefWidth="770.0" tabClosingPolicy="UNAVAILABLE">
+                <tabs>
+                    <Tab text="Tìm kiếm">
+                        <content>
+                            <GridPane>
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="474.20001220703125" minWidth="10.0" prefWidth="385.4000244140625" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="384.5999755859375" minWidth="10.0" prefWidth="384.5999755859375" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="42.60001220703125" minHeight="10.0" prefHeight="37.799993896484374" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="76.00000610351562" minHeight="10.0" prefHeight="76.00000610351562" vgrow="SOMETIMES" />
+                           <RowConstraints maxHeight="45.59998168945313" minHeight="31.999975585937506" prefHeight="31.999975585937506" />
+                                </rowConstraints>
+                                <children>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                        <children>
+                                            <Text text="Ngày bắt đầu" wrappingWidth="83.71874928474426">
+                                    <HBox.margin>
+                                       <Insets right="10.0" />
+                                    </HBox.margin></Text>
+                                            <DatePicker prefHeight="26.0" prefWidth="161.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                        <children>
+                                            <Text text="Hạn sửa chữa">
+                                    <HBox.margin>
+                                       <Insets right="10.0" />
+                                    </HBox.margin></Text>
+                                            <DatePicker />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" GridPane.rowIndex="1">
+                                        <children>
+                                            <Text text="Kỹ thuật viên" wrappingWidth="75.48434448242188">
+                                    <HBox.margin>
+                                       <Insets right="10.0" />
+                                    </HBox.margin></Text>
+                                            <ComboBox prefHeight="26.0" prefWidth="172.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                        <children>
+                                            <Text text="Ghi chú">
+                                    <HBox.margin>
+                                       <Insets left="65.0" right="10.0" />
+                                    </HBox.margin></Text>
+                                            <TextField prefHeight="66.0" prefWidth="593.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="50.0" prefWidth="770.0" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                                        <children>
+                                            <Button prefHeight="26.0" prefWidth="54.0" text="Lưu" />
+                                        </children>
+                                    </HBox>
+                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <children>
+                                            <Text text="Thiết bị" wrappingWidth="62.1757493019104" />
+                                            <ComboBox prefHeight="26.0" prefWidth="198.0" />
+                              </children>
+                           </HBox>
+                                </children>
+                            </GridPane>
+                        </content>
+                    </Tab>
 
-            <!-- Bảng hiển thị lịch sử sửa chữa -->
-            <TableView fx:id="repairHistoryTable">
+                    <Tab text="Thêm lịch">
+                        <content>
+                            <GridPane>
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="386.40003662109376" minWidth="380.79998779296875" prefWidth="384.00001220703126" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="389.6000122070312" minWidth="383.9999755859375" prefWidth="387.1999877929688" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints maxHeight="48.000006103515624" minHeight="35.20000305175781" prefHeight="40.0" />
+                                    <RowConstraints maxHeight="50.40001220703125" minHeight="12.799993896484374" prefHeight="35.2" />
+                                    <RowConstraints maxHeight="92.79999618530273" minHeight="16.800024414062506" prefHeight="81.59998779296875" />
+                                    <RowConstraints maxHeight="90.40000000000002" minHeight="8.00000610351563" prefHeight="36.59999389648439" />
+                           <RowConstraints maxHeight="47.2" minHeight="0.0" prefHeight="0.0" />
+                           <RowConstraints maxHeight="26.400000000000006" minHeight="0.0" prefHeight="0.0" />
+                                </rowConstraints>
+                                <children>
+                                    <HBox alignment="CENTER" prefWidth="200.0">
+                                        <children>
+                                            <Text text="Ngày bắt đầu" wrappingWidth="104.51873731613159">
+                                    <HBox.margin>
+                                       <Insets />
+                                    </HBox.margin></Text>
+                                            <DatePicker prefHeight="26.0" prefWidth="166.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefWidth="200.0" GridPane.columnIndex="1">
+                                        <children>
+                                            <Text text="Hạn sửa chữa">
+                                    <HBox.margin>
+                                       <Insets right="10.0" />
+                                    </HBox.margin></Text>
+                                            <DatePicker prefHeight="26.0" prefWidth="168.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefWidth="400.0" GridPane.rowIndex="1">
+                                        <children>
+                                            <Text text="Kỹ thuật viên" wrappingWidth="77.08441019058228" />
+                                            <ComboBox prefHeight="26.0" prefWidth="198.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                        <children>
+                                            <Text text="Ghi chú" wrappingWidth="45.14181470870972">
+                                    <HBox.margin>
+                                       <Insets left="65.0" />
+                                    </HBox.margin></Text>
+                                            <TextField prefHeight="69.0" prefWidth="590.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefWidth="770.0" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                                        <children>
+                                            <Button prefHeight="26.0" prefWidth="53.0" text="Lưu" />
+                                        </children>
+                                    </HBox>
+                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <children>
+                                            <Text text="Thiết bị" wrappingWidth="65.3757905960083" />
+                                            <ComboBox prefHeight="26.0" prefWidth="185.0" />
+                              </children>
+                           </HBox>
+                                </children>
+                            </GridPane>
+                        </content>
+                    </Tab>
+                </tabs>
+            </TabPane>
+
+            <!-- Bảng hiển thị lịch sử hoạt động -->
+            <TableView fx:id="activityLogTable" prefHeight="400.0" prefWidth="770.0">
                 <columns>
-                    <TableColumn text="Mã thiết bị" fx:id="colDeviceId"/>
-                    <TableColumn text="Tên thiết bị" fx:id="colDeviceName"/>
-                    <TableColumn text="Thời gian sửa chữa" fx:id="colRepairDate"/>
-                    <TableColumn text="Người thực hiện" fx:id="colTechnician"/>
-                    <TableColumn text="Chi phí" fx:id="colCost"/>
+                    <TableColumn fx:id="colTimestamp" text="Thời gian" />
+                    <TableColumn fx:id="colUser" text="Người thực hiện" />
+                    <TableColumn fx:id="colAction1" text="Thiết bị" />
+                    <TableColumn fx:id="colAction" text="Ghi chú" />
+                    <TableColumn fx:id="colAction2" text="Chi phí" />
                 </columns>
             </TableView>
         </VBox>
     </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox spacing="10" />
+    </bottom>
 
 </BorderPane>

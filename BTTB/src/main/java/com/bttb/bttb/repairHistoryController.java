@@ -13,7 +13,7 @@ import javafx.fxml.Initializable;
  *
  * @author nhanh
  */
-public class Repair_historyController implements Initializable {
+public class repairHistoryController implements Initializable {
 
     /**
      * Initializes the controller class.
