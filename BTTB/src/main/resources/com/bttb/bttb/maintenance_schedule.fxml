@@ -11,12 +11,12 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="472.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="472.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
    <children>
-      <TableView layoutX="12.0" layoutY="161.0" prefHeight="177.0" prefWidth="576.0">
+      <TableView fx:id="tableDevices" layoutX="12.0" layoutY="161.0" prefHeight="177.0" prefWidth="576.0">
         <columns>
-          <TableColumn prefWidth="404.0" text="Tên thiết bị" />
-          <TableColumn prefWidth="172.00006103515625" text="Trạng thái" />
+          <TableColumn fx:id="colName" prefWidth="404.0" text="Tên thiết bị" />
+          <TableColumn fx:id="colStatus" prefWidth="172.00006103515625" text="Trạng thái" />
         </columns>
       </TableView>
       <ComboBox layoutX="121.0" layoutY="76.0" prefWidth="150.0" />
@@ -36,7 +36,6 @@
             <Font size="14.0" />
          </font>
       </Text>
-      <TextField layoutX="121.0" layoutY="117.0" />
       <Text layoutX="291.0" layoutY="135.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Chọn ngày">
          <font>
             <Font size="14.0" />
@@ -44,5 +43,7 @@
       </Text>
       <Button layoutX="250.0" layoutY="361.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="98.0" text="Lập lịch bảo trì" textAlignment="CENTER" />
       <Label layoutX="172.0" layoutY="419.0" prefHeight="32.0" prefWidth="238.0" text="Label" textAlignment="CENTER" />
+      <TextField layoutX="122.0" layoutY="118.0" prefHeight="26.0" prefWidth="80.0" />
+      <Label layoutX="215.0" layoutY="115.0" prefHeight="32.0" prefWidth="58.0" text="Label" />
    </children>
 </AnchorPane>
