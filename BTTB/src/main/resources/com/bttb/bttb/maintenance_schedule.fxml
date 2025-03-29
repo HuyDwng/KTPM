@@ -34,10 +34,10 @@
                   <Font size="15.0" />
                </font>
                <HBox.margin>
-                  <Insets left="50.0" />
+                  <Insets left="20.0" />
                </HBox.margin>
             </Text>
-            <ComboBox prefHeight="26.0" prefWidth="271.0">
+            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="271.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
@@ -57,10 +57,7 @@
                   <Insets />
                </HBox.margin>
             </Text>
-            <TextField prefHeight="22.0" prefWidth="91.0">
-               <font>
-                  <Font size="15.0" />
-               </font>
+            <TextField fx:id="txtTime">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
@@ -73,7 +70,7 @@
                   <Insets left="100.0" />
                </HBox.margin>
             </Text>
-            <DatePicker prefHeight="30.0" prefWidth="175.0">
+            <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="175.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
@@ -88,14 +85,14 @@
             <TableView fx:id="tableDevices" prefHeight="154.0" prefWidth="606.0">
               <columns>
                 <TableColumn fx:id="colName" prefWidth="375.1999953985214" text="Tên Thiết Bị" />
-                <TableColumn fx:id="colStatus" prefWidth="224.79998779296875" text="Trạng Thái" />
+                <TableColumn fx:id="colStatus" prefWidth="230.39999999999998" text="Trạng Thái" />
               </columns>
             </TableView>
          </children>
       </HBox>
       <HBox alignment="CENTER" prefHeight="66.0" prefWidth="706.0">
          <children>
-            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Lập Lịch" textAlignment="CENTER">
+            <Button fx:id="btnSchedule" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleScheduleButton" text="Lập Lịch" textAlignment="CENTER">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
@@ -104,7 +101,7 @@
       </HBox>
       <HBox alignment="TOP_CENTER" prefHeight="41.0" prefWidth="706.0">
          <children>
-            <Label text="Label" textAlignment="CENTER" />
+            <Label fx:id="lblMessage" text="Label" textAlignment="CENTER" />
          </children>
       </HBox>
    </children>
