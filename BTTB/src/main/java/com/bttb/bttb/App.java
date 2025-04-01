@@ -17,9 +17,10 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("system_settings"), 640, 480);
-        
+        scene = new Scene(loadFXML("repair_history"));
+
         stage.setScene(scene);
+        stage.sizeToScene(); // Điều chỉnh kích thước theo nội dung FXML
         stage.show();
     }
 
