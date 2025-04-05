@@ -1,7 +1,6 @@
 package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
-import com.bttb.services.DeviceServices;
 import com.bttb.services.ScheduleServices;
 import java.net.URL;
 import java.sql.SQLException;
@@ -17,21 +16,18 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
 
 public class MaintenanceScheduleController implements Initializable {
 
     @FXML
-    private TableView<Device> tableDevices;
-    @FXML
-    private TableColumn<Device, String> colName;
-    @FXML
-    private TableColumn<Device, String> colStatus;
-    @FXML
     private ComboBox<Device> comboBoxDevices;
     @FXML
-    private ComboBox<String> frequencyComboBox;
+    private ComboBox<Integer> comboBoxDevID;
+    @FXML
+    private ComboBox<String> comboBoxFrequency;
+    @FXML
+    private ComboBox<String> comboBoxExecutor;
     @FXML
     private DatePicker datePicker;
     @FXML
@@ -42,26 +38,32 @@ public class MaintenanceScheduleController implements Initializable {
     private Label lblMessage;
 
     private final ScheduleServices ss = new ScheduleServices();
-    private final DeviceServices ds = new DeviceServices();
     private ObservableList<Device> activeDevices;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
         lblMessage.setVisible(false);
         setupDatePicker();
         setupTimeField();
+        loadExecutors();
 
-        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        frequencyComboBox.setItems(FXCollections.observableArrayList(
-            "Hàng ngày", "Hàng tuần", "Hàng tháng", "Hàng năm"
+        comboBoxFrequency.setItems(FXCollections.observableArrayList(
+                "Hàng ngày", "Hàng tuần", "Hàng tháng", "Hàng năm"
         ));
-        frequencyComboBox.getSelectionModel().selectFirst();
-        try {
-            tableDevices.setItems(FXCollections.observableArrayList(ds.getDevices()));
+        comboBoxFrequency.getSelectionModel().selectFirst();
 
+        try {
             // Lưu danh sách thiết bị hoạt động làm biến toàn cục
             activeDevices = ss.getActiveDevices();
+            
+            ObservableList<Integer> deviceIds = FXCollections.observableArrayList();
+            
+            for (Device d : activeDevices) {
+                deviceIds.add(d.getId());
+            }
+
+            comboBoxDevID.setItems(deviceIds);
             comboBoxDevices.setItems(activeDevices);
 
             setupComboBoxSearch(); // Thiết lập tìm kiếm cho ComboBox
@@ -178,6 +180,11 @@ public class MaintenanceScheduleController implements Initializable {
         }
     }
 
+    public void loadExecutors() {
+        ObservableList<String> executors = ScheduleServices.loadExecutors();
+        comboBoxExecutor.setItems(executors);
+    }
+
     @FXML
     private void handleScheduleButton() throws SQLException {
         if (!validateInputs()) {
@@ -193,6 +200,8 @@ public class MaintenanceScheduleController implements Initializable {
         try {
             LocalDate selectedDate = datePicker.getValue();
             LocalTime selectedTime = LocalTime.parse(txtTime.getText());
+            String selectedFrequency = comboBoxFrequency.getSelectionModel().getSelectedItem();
+            String selectedExecutor = comboBoxExecutor.getSelectionModel().getSelectedItem();
 
             if (selectedDate == null || selectedTime == null) {
                 showError("Vui lòng nhập ngày và giờ hợp lệ!");
@@ -211,7 +220,7 @@ public class MaintenanceScheduleController implements Initializable {
                 return;
             }
 
-            if (scheduleService.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime)) {
+            if (scheduleService.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime, selectedFrequency, selectedExecutor)) {
                 showSuccess("Lập lịch thành công!");
             } else {
                 showError("Lưu lịch bảo trì thất bại!");
@@ -242,6 +251,14 @@ public class MaintenanceScheduleController implements Initializable {
         }
         if (datePicker.getValue().isBefore(java.time.LocalDate.now())) {
             showError("Ngày lập lịch phải là tương lai!");
+            return false;
+        }
+        if (comboBoxFrequency.getSelectionModel().getSelectedItem() == null) {
+            showError("Vui lòng chọn tần suất!");
+            return false;
+        }
+        if (comboBoxExecutor.getSelectionModel().getSelectedItem() == null) {
+            showError("Vui lòng chọn kỹ thuật viên!");
             return false;
         }
         return true;

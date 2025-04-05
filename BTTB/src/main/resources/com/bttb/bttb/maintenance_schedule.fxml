@@ -5,15 +5,13 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="583.0" prefWidth="706.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="337.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
    <children>
       <HBox alignment="CENTER" prefHeight="55.0" prefWidth="707.0">
          <children>
@@ -50,7 +48,7 @@
                   <Insets left="50.0" />
                </HBox.margin>
             </Text>
-            <ComboBox prefHeight="26.0" prefWidth="89.0">
+            <ComboBox fx:id="comboBoxDevID" prefHeight="26.0" prefWidth="89.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
@@ -103,7 +101,7 @@
                   <Insets left="5.0" />
                </HBox.margin>
             </Text>
-            <ComboBox prefHeight="26.0" prefWidth="112.0" />
+            <ComboBox fx:id="comboBoxFrequency" prefHeight="26.0" prefWidth="102.0" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Kỹ thuật viên:" textAlignment="CENTER" wrappingWidth="90.93672752380371">
                <font>
                   <Font size="15.0" />
@@ -112,7 +110,7 @@
                   <Insets left="100.0" />
                </HBox.margin>
             </Text>
-            <ComboBox prefWidth="150.0">
+            <ComboBox fx:id="comboBoxExecutor" prefWidth="150.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
@@ -122,17 +120,7 @@
             <Insets bottom="15.0" />
          </VBox.margin>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="238.0" prefWidth="706.0">
-         <children>
-            <TableView fx:id="tableDevices" prefHeight="154.0" prefWidth="606.0">
-              <columns>
-                <TableColumn fx:id="colName" prefWidth="375.1999953985214" text="Tên Thiết Bị" />
-                <TableColumn fx:id="colStatus" prefWidth="230.39999999999998" text="Trạng Thái" />
-              </columns>
-            </TableView>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="66.0" prefWidth="706.0">
+      <HBox alignment="CENTER" prefHeight="41.0" prefWidth="700.0">
          <children>
             <Button fx:id="btnSchedule" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleScheduleButton" text="Lập Lịch" textAlignment="CENTER">
                <HBox.margin>
