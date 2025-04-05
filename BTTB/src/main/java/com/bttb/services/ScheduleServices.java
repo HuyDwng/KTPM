@@ -37,27 +37,11 @@ public class ScheduleServices {
         return false;
     }
 
-    // 🔹 Lấy danh sách thiết bị từ database
-    public ObservableList<Device> getDevices() throws SQLException {
-        List<Device> devices = new ArrayList<>();
-        String query = "SELECT * FROM device";
-
-        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query); ResultSet rs = stm.executeQuery()) {
-            while (rs.next()) {
-                Device d = new Device();
-                d.setId(rs.getInt("id"));
-                d.setName(rs.getString("name"));
-                d.setStatus(rs.getString("status"));
-                devices.add(d);
-            }
-        }
-        return FXCollections.observableArrayList(devices);
-    }
-
     // 🔹 Lọc danh sách thiết bị có trạng thái "Đang hoạt động"
     public ObservableList<Device> getActiveDevices() throws SQLException {
+        DeviceServices DS = new DeviceServices();
         return FXCollections.observableArrayList(
-                getDevices().stream()
+                DS.getDevices().stream()
                         .filter(d -> "Đang hoạt động".equals(d.getStatus()))
                         .collect(Collectors.toList())
         );

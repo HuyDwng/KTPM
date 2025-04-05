@@ -13,43 +13,56 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="525.0" prefWidth="706.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="583.0" prefWidth="706.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
    <children>
-      <HBox alignment="TOP_CENTER" prefHeight="55.0" prefWidth="707.0">
+      <HBox alignment="CENTER" prefHeight="55.0" prefWidth="707.0">
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Lập Lịch Bảo Trì" textAlignment="CENTER" wrappingWidth="706.9394378662109">
                <font>
                   <Font size="35.0" />
                </font>
                <HBox.margin>
-                  <Insets />
+                  <Insets bottom="10.0" />
                </HBox.margin>
             </Text>
          </children>
       </HBox>
-      <HBox alignment="CENTER_LEFT" prefHeight="43.0" prefWidth="706.0">
+      <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Chọn Thiết Bị:" textAlignment="CENTER" wrappingWidth="94.13670921325684">
                <font>
                   <Font size="15.0" />
                </font>
                <HBox.margin>
-                  <Insets left="20.0" />
+                  <Insets />
                </HBox.margin>
             </Text>
-            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="271.0">
+            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="176.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </ComboBox>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mã thiết bị:" textAlignment="CENTER" wrappingWidth="90.93672752380371">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="50.0" />
+               </HBox.margin>
+            </Text>
+            <ComboBox prefHeight="26.0" prefWidth="89.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
             </ComboBox>
          </children>
          <VBox.margin>
-            <Insets bottom="10.0" />
+            <Insets bottom="15.0" />
          </VBox.margin>
       </HBox>
       <HBox alignment="CENTER" layoutX="10.0" layoutY="57.0" prefHeight="43.0" prefWidth="706.0">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Chọn Giờ:" textAlignment="CENTER" wrappingWidth="72.53670310974121">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Giờ bảo trì:" textAlignment="CENTER" wrappingWidth="74.93669724464417">
                <font>
                   <Font size="15.0" />
                </font>
@@ -57,12 +70,41 @@
                   <Insets />
                </HBox.margin>
             </Text>
-            <TextField fx:id="txtTime">
+            <TextField fx:id="txtTime" prefHeight="26.0" prefWidth="43.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
             </TextField>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Chọn Ngày:" textAlignment="CENTER" wrappingWidth="84.53670310974121">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ngày bảo trì:" textAlignment="CENTER" wrappingWidth="89.336690813303">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="145.0" />
+               </HBox.margin>
+            </Text>
+            <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="146.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </DatePicker>
+         </children>
+         <VBox.margin>
+            <Insets bottom="15.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Tần suất:" textAlignment="CENTER" wrappingWidth="72.53670310974121">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </Text>
+            <ComboBox prefHeight="26.0" prefWidth="112.0" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Kỹ thuật viên:" textAlignment="CENTER" wrappingWidth="90.93672752380371">
                <font>
                   <Font size="15.0" />
                </font>
@@ -70,14 +112,14 @@
                   <Insets left="100.0" />
                </HBox.margin>
             </Text>
-            <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="175.0">
+            <ComboBox prefWidth="150.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
-            </DatePicker>
+            </ComboBox>
          </children>
          <VBox.margin>
-            <Insets bottom="10.0" />
+            <Insets bottom="15.0" />
          </VBox.margin>
       </HBox>
       <HBox alignment="CENTER" prefHeight="238.0" prefWidth="706.0">

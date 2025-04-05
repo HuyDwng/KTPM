@@ -3,18 +3,22 @@ package com.bttb.bttb;
 import com.bttb.pojo.Device;
 import com.bttb.services.DeviceServices;
 import com.bttb.services.ScheduleServices;
-import com.bttb.services.Utils;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.StringConverter;
 
 public class MaintenanceScheduleController implements Initializable {
 
@@ -27,6 +31,8 @@ public class MaintenanceScheduleController implements Initializable {
     @FXML
     private ComboBox<Device> comboBoxDevices;
     @FXML
+    private ComboBox<String> frequencyComboBox;
+    @FXML
     private DatePicker datePicker;
     @FXML
     private TextField txtTime;
@@ -35,25 +41,78 @@ public class MaintenanceScheduleController implements Initializable {
     @FXML
     private Label lblMessage;
 
-    private final DeviceServices deviceService = new DeviceServices();
+    private final ScheduleServices ss = new ScheduleServices();
+    private final DeviceServices ds = new DeviceServices();
+    private ObservableList<Device> activeDevices;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        ScheduleServices service = new ScheduleServices();
-
+        lblMessage.setVisible(false);
         setupDatePicker();
         setupTimeField();
+
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-
-        // 🔹 Load danh sách thiết bị vào bảng
+        frequencyComboBox.setItems(FXCollections.observableArrayList(
+            "Hàng ngày", "Hàng tuần", "Hàng tháng", "Hàng năm"
+        ));
+        frequencyComboBox.getSelectionModel().selectFirst();
         try {
-            tableDevices.setItems(service.getDevices());
-            comboBoxDevices.setItems(service.getActiveDevices());
+            tableDevices.setItems(FXCollections.observableArrayList(ds.getDevices()));
+
+            // Lưu danh sách thiết bị hoạt động làm biến toàn cục
+            activeDevices = ss.getActiveDevices();
+            comboBoxDevices.setItems(activeDevices);
+
+            setupComboBoxSearch(); // Thiết lập tìm kiếm cho ComboBox
+
         } catch (SQLException e) {
             showError("Lỗi khi tải dữ liệu thiết bị: " + e.getMessage());
         }
-        btnSchedule.setOnAction(event -> handleScheduleButton());
+
+        btnSchedule.setOnAction(event -> {
+            try {
+                handleScheduleButton();
+            } catch (SQLException ex) {
+                Logger.getLogger(MaintenanceScheduleController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+    }
+
+    // Thêm tìm kiếm vào ComboBox
+    private void setupComboBoxSearch() {
+        comboBoxDevices.setEditable(true);
+
+        // Tạo danh sách lọc từ danh sách thiết bị đang hoạt động
+        FilteredList<Device> filteredList = new FilteredList<>(FXCollections.observableArrayList(activeDevices), p -> true);
+
+        comboBoxDevices.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+            filteredList.setPredicate(device -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                return device.getName().toLowerCase().contains(newValue.toLowerCase());
+            });
+
+            // Cập nhật danh sách thiết bị cho ComboBox
+            comboBoxDevices.setItems(filteredList);
+        });
+
+        // Đảm bảo hiển thị đúng thông tin của đối tượng Device trong ComboBox
+        comboBoxDevices.setConverter(new StringConverter<Device>() {
+            @Override
+            public String toString(Device device) {
+                return device != null ? device.getName() : "";
+            }
+
+            @Override
+            public Device fromString(String string) {
+                return activeDevices.stream()
+                        .filter(device -> device.getName().equalsIgnoreCase(string))
+                        .findFirst()
+                        .orElse(null);
+            }
+        });
     }
 
     private void setupDatePicker() {
@@ -68,37 +127,7 @@ public class MaintenanceScheduleController implements Initializable {
             }
         });
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        datePicker.setConverter(new javafx.util.StringConverter<>() {
-            @Override
-            public String toString(LocalDate date) {
-                return (date != null) ? formatter.format(date) : "";
-            }
-
-            @Override
-            public LocalDate fromString(String text) {
-                try {
-                    return (text != null && !text.isEmpty()) ? LocalDate.parse(text, formatter) : null;
-                } catch (Exception e) {
-                    return null;
-                }
-            }
-        });
-
-        datePicker.getEditor().textProperty().addListener((obs, oldText, newText) -> {
-            try {
-                LocalDate parsedDate = LocalDate.parse(newText, formatter);
-                datePicker.setValue(parsedDate);
-            } catch (Exception ignored) {
-            }
-        });
-
         datePicker.setValue(LocalDate.now());
-    }
-
-    public LocalTime getSelectedTime() {
-        return LocalTime.parse(txtTime.getText());
     }
 
     private void setupTimeField() {
@@ -117,7 +146,7 @@ public class MaintenanceScheduleController implements Initializable {
             if (text.length() < 5) { // Đảm bảo không vượt quá "HH:mm"
                 int caretPos = txtTime.getCaretPosition();
                 if (caretPos == 2) {
-                    txtTime.positionCaret(3); // Tự động nhảy qua dấu `:`
+                    txtTime.positionCaret(3); // Tự động nhảy qua dấu :
                 }
             }
         });
@@ -150,26 +179,17 @@ public class MaintenanceScheduleController implements Initializable {
     }
 
     @FXML
-    private void handleScheduleButton() {
-        // Kiểm tra các input có hợp lệ không
+    private void handleScheduleButton() throws SQLException {
         if (!validateInputs()) {
             return;
         }
 
-        // Lấy thiết bị được chọn
         Device selectedDevice = comboBoxDevices.getSelectionModel().getSelectedItem();
-        if (selectedDevice == null) {
-            showError("Vui lòng chọn thiết bị!");
-            return;
-        }
-
-        // Kiểm tra trạng thái của thiết bị
         if (!"Đang hoạt động".equals(selectedDevice.getStatus())) {
             showError("Chỉ có thể lập lịch cho thiết bị đang hoạt động!");
             return;
         }
 
-        // Lấy ngày và giờ từ DatePicker & TextField
         try {
             LocalDate selectedDate = datePicker.getValue();
             LocalTime selectedTime = LocalTime.parse(txtTime.getText());
@@ -179,24 +199,18 @@ public class MaintenanceScheduleController implements Initializable {
                 return;
             }
 
-            // Chuyển thành LocalDateTime để khớp với `isScheduleDuplicate()`
             LocalDateTime scheduleDateTime = LocalDateTime.of(selectedDate, selectedTime);
-
-            // Kiểm tra thời gian có phải tương lai không
             if (scheduleDateTime.isBefore(LocalDateTime.now())) {
                 showError("Thời gian lập lịch phải ở tương lai!");
                 return;
             }
 
             ScheduleServices scheduleService = new ScheduleServices();
-
-            // Kiểm tra trùng lịch
             if (scheduleService.isScheduleDuplicate(selectedDevice.getId(), scheduleDateTime)) {
                 showError("Lịch bảo trì đã tồn tại vào thời gian này!");
                 return;
             }
 
-            // Thêm lịch bảo trì vào database (đổi lại tham số cho đúng)
             if (scheduleService.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime)) {
                 showSuccess("Lập lịch thành công!");
             } else {
@@ -210,7 +224,7 @@ public class MaintenanceScheduleController implements Initializable {
     }
 
     private boolean validateInputs() {
-        if (comboBoxDevices.getSelectionModel().isEmpty()) {
+        if (comboBoxDevices.getSelectionModel().getSelectedItem() == null) {
             showError("Vui lòng chọn thiết bị!");
             return false;
         }
@@ -236,11 +250,12 @@ public class MaintenanceScheduleController implements Initializable {
     private void showSuccess(String message) {
         lblMessage.setText(message);
         lblMessage.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+        lblMessage.setVisible(true);
     }
 
     private void showError(String message) {
         lblMessage.setText(message);
         lblMessage.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+        lblMessage.setVisible(true);
     }
-
 }
