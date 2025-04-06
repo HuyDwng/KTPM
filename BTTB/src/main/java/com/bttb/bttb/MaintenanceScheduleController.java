@@ -1,6 +1,7 @@
 package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
+import com.bttb.pojo.EmailUtils;
 import com.bttb.services.ScheduleServices;
 import java.net.URL;
 import java.sql.SQLException;
@@ -22,8 +23,6 @@ public class MaintenanceScheduleController implements Initializable {
 
     @FXML
     private ComboBox<Device> comboBoxDevices;
-    @FXML
-    private ComboBox<Integer> comboBoxDevID;
     @FXML
     private ComboBox<String> comboBoxFrequency;
     @FXML
@@ -56,14 +55,6 @@ public class MaintenanceScheduleController implements Initializable {
         try {
             // Lưu danh sách thiết bị hoạt động làm biến toàn cục
             activeDevices = ss.getActiveDevices();
-            
-            ObservableList<Integer> deviceIds = FXCollections.observableArrayList();
-            
-            for (Device d : activeDevices) {
-                deviceIds.add(d.getId());
-            }
-
-            comboBoxDevID.setItems(deviceIds);
             comboBoxDevices.setItems(activeDevices);
 
             setupComboBoxSearch(); // Thiết lập tìm kiếm cho ComboBox
@@ -81,38 +72,69 @@ public class MaintenanceScheduleController implements Initializable {
         });
     }
 
-    // Thêm tìm kiếm vào ComboBox
     private void setupComboBoxSearch() {
         comboBoxDevices.setEditable(true);
 
-        // Tạo danh sách lọc từ danh sách thiết bị đang hoạt động
-        FilteredList<Device> filteredList = new FilteredList<>(FXCollections.observableArrayList(activeDevices), p -> true);
+        FilteredList<Device> filteredList = new FilteredList<>(activeDevices, p -> true);
+        comboBoxDevices.setItems(filteredList);
 
         comboBoxDevices.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
             filteredList.setPredicate(device -> {
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
-                return device.getName().toLowerCase().contains(newValue.toLowerCase());
+                return device.getName().toLowerCase().contains(newValue.toLowerCase())
+                        || String.valueOf(device.getId()).contains(newValue);
             });
 
-            // Cập nhật danh sách thiết bị cho ComboBox
-            comboBoxDevices.setItems(filteredList);
+            // Nếu đang gõ, chưa chọn item → clear selection
+            if (comboBoxDevices.getSelectionModel().getSelectedItem() == null
+                    || !comboBoxDevices.getSelectionModel().getSelectedItem().getName().equalsIgnoreCase(newValue)) {
+                comboBoxDevices.getSelectionModel().clearSelection();
+            }
         });
 
-        // Đảm bảo hiển thị đúng thông tin của đối tượng Device trong ComboBox
         comboBoxDevices.setConverter(new StringConverter<Device>() {
             @Override
             public String toString(Device device) {
-                return device != null ? device.getName() : "";
+                return device != null ? String.format("ID: %d - %s", device.getId(), device.getName()) : "";
             }
 
             @Override
             public Device fromString(String string) {
                 return activeDevices.stream()
-                        .filter(device -> device.getName().equalsIgnoreCase(string))
-                        .findFirst()
-                        .orElse(null);
+                        .filter(d -> String.format("ID: %d - %s", d.getId(), d.getName()).equalsIgnoreCase(string)
+                        || d.getName().equalsIgnoreCase(string))
+                        .findFirst().orElse(null);
+            }
+        });
+
+        comboBoxDevices.setCellFactory(cb -> new ListCell<>() {
+            @Override
+            protected void updateItem(Device item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("ID: %d - %s", item.getId(), item.getName()));
+            }
+        });
+
+        comboBoxDevices.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Device item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("ID: %d - %s", item.getId(), item.getName()));
+            }
+        });
+
+        // Khi focus rời khỏi editor → ép chọn đúng device nếu có
+        comboBoxDevices.getEditor().focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+            if (!isFocused) {
+                String input = comboBoxDevices.getEditor().getText();
+                Device matched = activeDevices.stream()
+                        .filter(d -> String.format("ID: %d - %s", d.getId(), d.getName()).equalsIgnoreCase(input)
+                        || d.getName().equalsIgnoreCase(input))
+                        .findFirst().orElse(null);
+
+                comboBoxDevices.getSelectionModel().select(matched);
             }
         });
     }
@@ -196,6 +218,25 @@ public class MaintenanceScheduleController implements Initializable {
             showError("Chỉ có thể lập lịch cho thiết bị đang hoạt động!");
             return;
         }
+
+//        if (scheduleService.addMaintenanceSchedule(...)) {
+//            showSuccess("Lập lịch thành công!");
+//
+//            // Gửi email
+//            String executorEmail = ScheduleServices.getEmailByExecutorName(selectedExecutor);
+//            if (executorEmail != null) {
+//                EmailUtils.sendEmail(executorEmail,
+//                        "Thông báo lịch bảo trì",
+//                        String.format("Bạn được phân công bảo trì thiết bị '%s' vào lúc %s %s.",
+//                                selectedDevice.getName(),
+//                                selectedDate.toString(),
+//                                selectedTime.toString())
+//                );
+//            }
+//
+//        } else {
+//            showError("Lưu lịch bảo trì thất bại!");
+//        }
 
         try {
             LocalDate selectedDate = datePicker.getValue();

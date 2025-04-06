@@ -50,9 +50,9 @@ public class ScheduleServices {
         ObservableList<String> executors = FXCollections.observableArrayList();
         try (Connection conn = JdbcUtils.getConn()) {
             String sql = "SELECT * FROM user";
-            PreparedStatement stm = conn.prepareCall(sql);    
+            PreparedStatement stm = conn.prepareCall(sql);
             ResultSet rs = stm.executeQuery();
-            
+
             while (rs.next()) {
                 executors.add(rs.getString("name"));
             }
@@ -77,6 +77,20 @@ public class ScheduleServices {
             stm.setString(5, executor);
             return stm.executeUpdate() > 0; // Trả về true nếu thêm thành công
         }
+    }
+
+    public static String getEmailByExecutorName(String name) {
+        String sql = "SELECT email FROM users WHERE name = ?";
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

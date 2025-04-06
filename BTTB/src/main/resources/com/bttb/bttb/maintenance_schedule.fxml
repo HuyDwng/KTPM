@@ -35,20 +35,7 @@
                   <Insets />
                </HBox.margin>
             </Text>
-            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="176.0">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
-            </ComboBox>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Mã thiết bị:" textAlignment="CENTER" wrappingWidth="90.93672752380371">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets left="50.0" />
-               </HBox.margin>
-            </Text>
-            <ComboBox fx:id="comboBoxDevID" prefHeight="26.0" prefWidth="89.0">
+            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="306.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
@@ -98,7 +85,7 @@
                   <Font size="15.0" />
                </font>
                <HBox.margin>
-                  <Insets left="5.0" />
+                  <Insets />
                </HBox.margin>
             </Text>
             <ComboBox fx:id="comboBoxFrequency" prefHeight="26.0" prefWidth="102.0" />

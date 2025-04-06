@@ -3,6 +3,7 @@ module com.bttb.bttb {
     requires javafx.fxml;
     requires java.sql;
     requires java.base;
+    requires jakarta.mail;
 
     opens com.bttb.bttb to javafx.fxml;
     exports com.bttb.bttb;
