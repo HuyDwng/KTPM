@@ -14,11 +14,9 @@
         <HBox spacing="10">
             <Label text="Quản lý thiết bị" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
             <Region HBox.hgrow="ALWAYS" />
-            <TextField fx:id="searchField" promptText="Tìm kiếm thiết bị..." />
-            
-            <ComboBox fx:id="statusFilter" />
-            
-            <Button fx:id="btnSearch" text="Tìm kiếm" />
+            <TextField fx:id="searchField" promptText="Tìm kiếm thiết bị..."/>
+            <ComboBox fx:id="statusFilter"/>
+            <Button fx:id="btnSearch" text="Tìm kiếm" onAction="#onSearchChanged"/>
         </HBox>
     </top>
 
@@ -29,7 +27,7 @@
                 <TableColumn text="Mã thiết bị" fx:id="colDeviceId"/>
                 <TableColumn text="Tên thiết bị" fx:id="colDeviceName"/>
                 <TableColumn text="Trạng thái" fx:id="colStatus"/>
-                <TableColumn text="Vị trí" fx:id="colLocation"/>
+                
             </columns>
         </TableView>
     </center>
@@ -37,9 +35,11 @@
     <!-- Footer -->
     <bottom>
         <HBox spacing="10">
-            <Button fx:id="btnAddDevice" text="Thêm thiết bị" />
-            <Button fx:id="btnUpdateStatus" text="Cập nhật trạng thái" />
-            <Button fx:id="btnDeleteDevice" text="Xóa thiết bị" />
+            <Button fx:id="btnAddDevice" text="Thêm thiết bị" onAction="#openAddDeviceWindow"/>
+            
+            <Button fx:id="btnUpdateStatus" text="Cập nhật trạng thái" onAction="#openUpdateStatusForm"/>
+           
+            <Button fx:id="btnDeleteDevice" text="Xóa thiết bị" onAction="#deleteDevice"/>
         </HBox>
     </bottom>
 

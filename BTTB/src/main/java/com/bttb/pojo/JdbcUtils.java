@@ -1,17 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.bttb.pojo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- *
- * @author LEGION
- */
 public class JdbcUtils {
     static {
         try {
@@ -21,6 +13,7 @@ public class JdbcUtils {
     }
     
     public static Connection getConn() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/bttb", "root", "huyduong2004");
+        return DriverManager.getConnection("jdbc:mysql://localhost/bttbdb", "root", "huyduong2004");
     }
 }
+

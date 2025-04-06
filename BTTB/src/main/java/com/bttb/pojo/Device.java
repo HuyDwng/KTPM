@@ -4,12 +4,8 @@
  */
 package com.bttb.pojo;
 
-/**
- *
- * @author LEGION
- */
-public class Device {
 
+public class Device {
     private int id;
     private String name;
     private String status;
@@ -23,14 +19,16 @@ public class Device {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return String.format("ID: %d - %s", this.id, this.name);
+    public Device(String name, String status) {
+        this.name = name;
+        this.status = status;
     }
 
-    /**
-     * @return the id
-     */
+    @Override
+    public String toString() {
+        return id + " - " + name;  // Hiển thị dạng "1 - Laptop"
+    }
+  
     public int getId() {
         return id;
     }
@@ -48,7 +46,6 @@ public class Device {
     public String getName() {
         return name;
     }
-
     /**
      * @param name the name to set
      */
