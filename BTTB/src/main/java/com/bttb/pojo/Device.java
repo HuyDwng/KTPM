@@ -25,7 +25,7 @@ public class Device {
 
     @Override
     public String toString() {
-        return String.format("ID: %d - %s", this.id, this.name);
+        return id + " - " + name;
     }
 
     /**

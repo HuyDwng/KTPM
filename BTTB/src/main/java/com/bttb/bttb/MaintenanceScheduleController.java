@@ -48,7 +48,7 @@ public class MaintenanceScheduleController implements Initializable {
         loadExecutors();
 
         comboBoxFrequency.setItems(FXCollections.observableArrayList(
-                "Hàng ngày", "Hàng tuần", "Hàng tháng", "Hàng năm"
+                "Hàng tuần", "Hàng tháng", "Hàng năm"
         ));
         comboBoxFrequency.getSelectionModel().selectFirst();
 
