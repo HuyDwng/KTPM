@@ -18,7 +18,6 @@ import java.util.List;
  * @author LEGION
  */
 public class DeviceServices {
-
     public List<Device> getDevices() throws SQLException {
         List<Device> devices = new ArrayList<>();
         try (Connection conn = JdbcUtils.getConn()) {
