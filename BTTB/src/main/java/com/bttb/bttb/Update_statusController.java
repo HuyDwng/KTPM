@@ -1,7 +1,8 @@
 package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
-import com.bttb.service.DeviceService;
+import com.bttb.services.DeviceServices;
+import java.sql.SQLException;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
@@ -22,10 +23,10 @@ public class Update_statusController {
     @FXML
     private Button btnConfirm;
 
-    private DeviceService deviceService;
+    private DeviceServices deviceService;
     private Device_managementController deviceManagementController;
 
-    public void setDeviceService(DeviceService service) {
+    public void setDeviceService(DeviceServices service) throws SQLException {
         this.deviceService = service;
         loadDeviceList();
     }
@@ -36,9 +37,9 @@ public class Update_statusController {
 
     
 
-    private void loadDeviceList() {
+    private void loadDeviceList() throws SQLException {
         if (deviceService != null) {
-            List<Device> devices = deviceService.getAllDevices();
+            List<Device> devices = deviceService.getDevices();
             cbDevice.setItems(FXCollections.observableArrayList(devices));
         }
     }

@@ -1,7 +1,7 @@
 package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
-import com.bttb.service.DeviceService;
+import com.bttb.services.DeviceServices;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,10 +16,10 @@ public class Add_deviceController {
     @FXML
     private ComboBox<String> statusComboBox;
     
-    private DeviceService deviceService;
+    private DeviceServices deviceService;
 
     public void setDeviceManagementController(Device_managementController controller) {
-        this.deviceService = new DeviceService(controller);
+        this.deviceService = new DeviceServices(controller);
     }
 
     public void addDevice() {

@@ -18,15 +18,14 @@ public class Device {
         this.status = status;
     }
 
-
+    @Override
+    public String toString() {
+        return id + " - " + name;
+    }
+    
     public Device(String name, String status) {
         this.name = name;
         this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return id + " - " + name;  // Hiển thị dạng "1 - Laptop"
     }
   
     public int getId() {

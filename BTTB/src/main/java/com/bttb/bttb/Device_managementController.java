@@ -6,7 +6,7 @@ package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
-import com.bttb.service.DeviceService;
+import com.bttb.services.DeviceServices;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -60,7 +60,7 @@ public class Device_managementController implements Initializable {
 
     private ObservableList<Device> deviceList = FXCollections.observableArrayList();
 
-    private DeviceService deviceService = new DeviceService();
+    private DeviceServices deviceService = new DeviceServices();
 
     public void openAddDeviceWindow() {
         try {
@@ -121,7 +121,7 @@ public class Device_managementController implements Initializable {
 
         String query = "SELECT id, name, status FROM device";
 
-        try (Connection conn = JdbcUtils.getConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -162,7 +162,7 @@ public class Device_managementController implements Initializable {
             Parent root = loader.load();
 
             Update_statusController controller = loader.getController();
-            controller.setDeviceService(new DeviceService());
+            controller.setDeviceService(new DeviceServices());
             controller.setDeviceManagementController(this);
 
             Stage stage = new Stage();
@@ -242,7 +242,7 @@ public class Device_managementController implements Initializable {
 
         String query = "SELECT id, name, status FROM device";
 
-        try (Connection conn = JdbcUtils.getConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 int id = rs.getInt("id");
