@@ -33,4 +33,19 @@ public class DeviceServices {
             return devices;
         }
     }
+
+    public List<String> getBrokenDevices() throws SQLException {
+        List<String> brokenDevices = new ArrayList<>();
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT DISTINCT id FROM device WHERE status = 'Hỏng hóc'";
+            PreparedStatement stm = conn.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+
+            while (rs.next()) {
+                brokenDevices.add(rs.getString("id"));
+            }
+        }
+        return brokenDevices;
+    }
+
 }

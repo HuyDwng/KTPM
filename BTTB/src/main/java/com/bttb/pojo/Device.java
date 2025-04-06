@@ -4,7 +4,6 @@
  */
 package com.bttb.pojo;
 
-
 public class Device {
     private int id;
     private String name;
@@ -18,6 +17,7 @@ public class Device {
         this.name = name;
         this.status = status;
     }
+
 
     public Device(String name, String status) {
         this.name = name;
@@ -52,7 +52,6 @@ public class Device {
     public void setName(String name) {
         this.name = name;
     }
-
     /**
      * @return the status
      */

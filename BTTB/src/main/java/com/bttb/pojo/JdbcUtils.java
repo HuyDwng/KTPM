@@ -16,4 +16,3 @@ public class JdbcUtils {
         return DriverManager.getConnection("jdbc:mysql://localhost/bttbdb", "root", "huyduong2004");
     }
 }
-
