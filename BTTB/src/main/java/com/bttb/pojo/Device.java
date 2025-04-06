@@ -4,12 +4,7 @@
  */
 package com.bttb.pojo;
 
-/**
- *
- * @author LEGION
- */
 public class Device {
-
     private int id;
     private String name;
     private String status;
@@ -27,10 +22,12 @@ public class Device {
     public String toString() {
         return id + " - " + name;
     }
-
-    /**
-     * @return the id
-     */
+    
+    public Device(String name, String status) {
+        this.name = name;
+        this.status = status;
+    }
+  
     public int getId() {
         return id;
     }
@@ -48,14 +45,12 @@ public class Device {
     public String getName() {
         return name;
     }
-
     /**
      * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
     }
-
     /**
      * @return the status
      */

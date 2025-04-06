@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bttb.bttb.Update_statusController">
+    
+    <Label text="Cập nhật trạng thái thiết bị" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    
+    <HBox spacing="10">
+        <Label text="Chọn thiết bị:"/>
+        <ComboBox fx:id="cbDevice"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Chọn trạng thái:"/>
+        <ComboBox fx:id="cbStatus"/>
+    </HBox>
+
+    <Button text="Xác nhận" fx:id="btnConfirm" onAction="#updateStatus"/>
+</VBox>

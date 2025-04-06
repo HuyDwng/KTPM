@@ -250,12 +250,14 @@ public class MaintenanceScheduleController implements Initializable {
             }
 
             LocalDateTime scheduleDateTime = LocalDateTime.of(selectedDate, selectedTime);
+          
             if (scheduleDateTime.isBefore(LocalDateTime.now())) {
                 showError("Thời gian lập lịch phải ở tương lai!");
                 return;
             }
 
             ScheduleServices scheduleService = new ScheduleServices();
+
             if (scheduleService.isScheduleDuplicate(selectedDevice.getId(), scheduleDateTime)) {
                 showError("Lịch bảo trì đã tồn tại vào thời gian này!");
                 return;

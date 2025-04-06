@@ -1,41 +1,163 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.Repair_historyController">
+<BorderPane prefHeight="581.0" prefWidth="838.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.RepairHistoryController">
 
     <!-- Header -->
     <top>
-        <Label text="Lịch sử sửa chữa" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" />
+        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" text="Quản lý lịch sử hoạt động" />
     </top>
 
     <!-- Main Content -->
     <center>
-        <VBox spacing="10">
-            <!-- Bộ lọc tìm kiếm -->
-            <HBox spacing="10">
-                <Label text="Tìm theo thiết bị:" />
-                <ComboBox fx:id="deviceFilter" prefWidth="200"/>
-                <Label text="Từ ngày:" />
-                <DatePicker fx:id="startDatePicker"/>
-                <Label text="Đến ngày:" />
-                <DatePicker fx:id="endDatePicker"/>
-                <Button fx:id="btnSearch" text="Tìm kiếm" />
-            </HBox>
+        <VBox prefHeight="507.0" prefWidth="770.0" spacing="10">
+            <TabPane prefHeight="332.0" prefWidth="770.0" tabClosingPolicy="UNAVAILABLE">
+                <tabs>
+                    <Tab text="Tìm kiếm">
+                        <content>
+                            <GridPane>
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="474.20001220703125" minWidth="10.0" prefWidth="385.4000244140625" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="384.5999755859375" minWidth="10.0" prefWidth="384.5999755859375" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="42.60001220703125" minHeight="10.0" prefHeight="37.799993896484374" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="45.59998168945313" minHeight="31.999975585937506" prefHeight="31.999975585937506" />
+                                </rowConstraints>
+                                <children>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                        <children>
+                                            <Text text="Ngày bắt đầu" wrappingWidth="83.71874928474426">
+                                                <HBox.margin>
+                                                    <Insets right="10.0" />
+                                                </HBox.margin>
+                                            </Text>
+                                            <DatePicker fx:id="findStartDatePicker" prefHeight="26.0" prefWidth="161.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                        <children>
+                                            <Text text="Ngày hoàn thành">
+                                                <HBox.margin>
+                                                    <Insets right="10.0" />
+                                                </HBox.margin>
+                                            </Text>
+                                            <DatePicker fx:id="findEndDatePicker" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" GridPane.rowIndex="1">
+                                        <children>
+                                            <Text text="Kỹ thuật viên" wrappingWidth="75.48434448242188">
+                                                <HBox.margin>
+                                                    <Insets right="10.0" />
+                                                </HBox.margin>
+                                            </Text>
+                                            <ComboBox fx:id="findTechnicianComboBox" prefHeight="26.0" prefWidth="172.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="50.0" prefWidth="770.0" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                        <children>
+                                            <Button onAction="#handleSearchRepairHistory" prefHeight="26.0" prefWidth="54.0" text="Tìm" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <children>
+                                            <Text text="Mã thiết bị" wrappingWidth="82.97567546367645" />
+                                            <ComboBox fx:id="findDeviceComboBox" prefHeight="26.0" prefWidth="198.0" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </GridPane>
+                        </content>
+                    </Tab>
 
-            <!-- Bảng hiển thị lịch sử sửa chữa -->
-            <TableView fx:id="repairHistoryTable">
+                    <Tab text="Thêm lịch">
+                        <content>
+                            <GridPane>
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="474.20001220703125" minWidth="10.0" prefWidth="385.4000244140625" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="384.5999755859375" minWidth="10.0" prefWidth="384.5999755859375" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="42.60001220703125" minHeight="10.0" prefHeight="37.799993896484374" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="45.59998168945313" minHeight="31.999975585937506" prefHeight="31.999975585937506" />
+                                </rowConstraints>
+                                <children>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                        <children>
+                                            <Text text="Ngày bắt đầu" wrappingWidth="83.71874928474426">
+                                                <HBox.margin>
+                                                    <Insets right="10.0" />
+                                                </HBox.margin>
+                                            </Text>
+                                            <DatePicker fx:id="addRepairDatePicker" prefHeight="26.0" prefWidth="161.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" GridPane.rowIndex="1">
+                                        <children>
+                                            <Text text="Kỹ thuật viên" wrappingWidth="75.48434448242188">
+                                                <HBox.margin>
+                                                    <Insets right="10.0" />
+                                                </HBox.margin>
+                                            </Text>
+                                            <ComboBox fx:id="addTechnicianComboBox" prefHeight="26.0" prefWidth="172.0" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="50.0" prefWidth="770.0" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                        <children>
+                                            <Button onAction="#handleSaveRepairHistory" prefHeight="26.0" prefWidth="53.0" text="Lưu" />
+                                        </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                        <children>
+                                            <Text text="Mã thiết bị" wrappingWidth="82.97567546367645" />
+                                            <ComboBox fx:id="addDeviceComboBox" prefHeight="26.0" prefWidth="198.0" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </GridPane>
+                        </content>
+                    </Tab>
+                </tabs>
+            </TabPane>
+
+            <!-- Bảng hiển thị lịch sử hoạt động -->
+            <TableView fx:id="tableRepairHistory" prefHeight="546.0" prefWidth="770.0">
                 <columns>
-                    <TableColumn text="Mã thiết bị" fx:id="colDeviceId"/>
-                    <TableColumn text="Tên thiết bị" fx:id="colDeviceName"/>
-                    <TableColumn text="Thời gian sửa chữa" fx:id="colRepairDate"/>
-                    <TableColumn text="Người thực hiện" fx:id="colTechnician"/>
-                    <TableColumn text="Chi phí" fx:id="colCost"/>
+                    <TableColumn fx:id="colDeviceId" prefWidth="102.39999085664749" text="Thiết bị" />
+                    <TableColumn fx:id="colTechnician" prefWidth="107.20001220703125" text="Kỹ thuật viên" />
+                    <TableColumn fx:id="colRepairDate" prefWidth="117.59999084472656" text="Ngày bắt đầu" />
+                    <TableColumn fx:id="colCompletionDate" prefWidth="134.4000244140625" text="Ngày hoàn thành" />
+                    <TableColumn fx:id="colStatus" prefWidth="100.79998779296875" text="Trạng thái" />
+                    <TableColumn fx:id="colCost" minWidth="0.0" prefWidth="114.4000244140625" text="Chi phí" />
+                    <TableColumn fx:id="colAction" prefWidth="161.59991455078125" text="Hành động" />  <!-- Đây là cột chứa nút "Hoàn Thành" và "Xóa" -->
                 </columns>
             </TableView>
+
         </VBox>
     </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox spacing="10" />
+    </bottom>
 
 </BorderPane>

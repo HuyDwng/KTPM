@@ -68,7 +68,6 @@ public class ScheduleServices {
     // 🔹 Thêm lịch bảo trì mới vào database
     public boolean addMaintenanceSchedule(int deviceId, LocalDate scheduleDate, LocalTime scheduleTime, String frequency, String executor) throws SQLException {
         String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor) VALUES (?, ?, ?, ?, ?)";
-
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
             stm.setInt(1, deviceId);
             stm.setDate(2, Date.valueOf(scheduleDate));
@@ -92,5 +91,4 @@ public class ScheduleServices {
         }
         return null;
     }
-
 }
