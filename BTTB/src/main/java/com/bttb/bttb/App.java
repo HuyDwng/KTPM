@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import javafx.stage.Modality;
 
 /**
  * JavaFX App
@@ -17,10 +18,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("repair_history"));
-
+        scene = new Scene(loadFXML("device_management"));
         stage.setScene(scene);
-        stage.sizeToScene(); // Điều chỉnh kích thước theo nội dung FXML
+        stage.sizeToScene(); //update size theo fxml
         stage.show();
     }
 
@@ -32,7 +32,9 @@ public class App extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
-
+    
+    
+    
     public static void main(String[] args) {
         launch();
     }

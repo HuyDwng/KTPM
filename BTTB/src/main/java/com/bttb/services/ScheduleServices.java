@@ -12,8 +12,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,41 +35,60 @@ public class ScheduleServices {
         return false;
     }
 
-    // 🔹 Lấy danh sách thiết bị từ database
-    public ObservableList<Device> getDevices() throws SQLException {
-        List<Device> devices = new ArrayList<>();
-        String query = "SELECT * FROM device";
-
-        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query); ResultSet rs = stm.executeQuery()) {
-            while (rs.next()) {
-                Device d = new Device();
-                d.setId(rs.getInt("id"));
-                d.setName(rs.getString("name"));
-                d.setStatus(rs.getString("status"));
-                devices.add(d);
-            }
-        }
-        return FXCollections.observableArrayList(devices);
-    }
-
     // 🔹 Lọc danh sách thiết bị có trạng thái "Đang hoạt động"
     public ObservableList<Device> getActiveDevices() throws SQLException {
+        DeviceServices DS = new DeviceServices();
         return FXCollections.observableArrayList(
-                getDevices().stream()
+                DS.getDevices().stream()
                         .filter(d -> "Đang hoạt động".equals(d.getStatus()))
                         .collect(Collectors.toList())
         );
     }
 
-    // 🔹 Thêm lịch bảo trì mới vào database
-    public boolean addMaintenanceSchedule(int deviceId, LocalDate scheduleDate, LocalTime scheduleTime) throws SQLException {
-        String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time) VALUES (?, ?, ?)";
+    // Phương thức load danh sách người thực hiện từ cơ sở dữ liệu
+    public static ObservableList<String> loadExecutors() {
+        ObservableList<String> executors = FXCollections.observableArrayList();
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT * FROM user";
+            PreparedStatement stm = conn.prepareCall(sql);
+            ResultSet rs = stm.executeQuery();
 
+            while (rs.next()) {
+                executors.add(rs.getString("name"));
+            }
+
+        } catch (SQLException e) {
+            // Nếu có lỗi kết nối hay truy vấn, bạn có thể hiển thị thông báo lỗi
+            System.err.println("Error loading executors: " + e.getMessage());
+        }
+
+        return executors;  // Trả về danh sách người thực hiện
+    }
+
+    // 🔹 Thêm lịch bảo trì mới vào database
+    public boolean addMaintenanceSchedule(int deviceId, LocalDate scheduleDate, LocalTime scheduleTime, String frequency, String executor) throws SQLException {
+        String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
             stm.setInt(1, deviceId);
             stm.setDate(2, Date.valueOf(scheduleDate));
             stm.setTime(3, Time.valueOf(scheduleTime));
+            stm.setString(4, frequency);
+            stm.setString(5, executor);
             return stm.executeUpdate() > 0; // Trả về true nếu thêm thành công
         }
+    }
+
+    public static String getEmailByExecutorName(String name) {
+        String sql = "SELECT email FROM users WHERE name = ?";
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
