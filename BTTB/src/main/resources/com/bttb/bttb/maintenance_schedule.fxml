@@ -1,54 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.Maintenance_scheduleController">
-
-    <!-- Header -->
-    <top>
-        <Label text="Lập lịch bảo trì" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" />
-    </top>
-
-    <!-- Main Content -->
-    <center>
-        <VBox spacing="10">
-            <!-- Chọn thiết bị -->
-            <HBox spacing="10">
-                <Label text="Chọn thiết bị:" />
-                <ComboBox fx:id="deviceComboBox" prefWidth="200"/>
-            </HBox>
-
-            <!-- Chọn ngày bảo trì -->
-            <HBox spacing="10">
-                <Label text="Chọn ngày:" />
-                <DatePicker fx:id="datePicker"/>
-            </HBox>
-
-            <!-- Chọn giờ bảo trì -->
-            <HBox spacing="10">
-                <Label text="Chọn giờ:" />
-                <ComboBox fx:id="hourComboBox" prefWidth="80"/>
-                <Label text=":" />
-                <ComboBox fx:id="minuteComboBox" prefWidth="80"/>
-            </HBox>
-
-            <!-- Cảnh báo trùng lịch -->
-            <Label fx:id="warningLabel" text="" style="-fx-text-fill: red;"/>
-
-        </VBox>
-    </center>
-
-    <!-- Footer -->
-    <bottom>
-        <HBox spacing="10">
-            <Button fx:id="btnConfirm" text="Xác nhận" />
-            <Button fx:id="btnCancel" text="Hủy" />
-        </HBox>
-    </bottom>
-
-</BorderPane>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="337.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
+   <children>
+      <HBox alignment="CENTER" prefHeight="55.0" prefWidth="707.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Lập Lịch Bảo Trì" textAlignment="CENTER" wrappingWidth="706.9394378662109">
+               <font>
+                  <Font size="35.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="10.0" />
+               </HBox.margin>
+            </Text>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Chọn Thiết Bị:" textAlignment="CENTER" wrappingWidth="94.13670921325684">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Text>
+            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="306.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </ComboBox>
+         </children>
+         <VBox.margin>
+            <Insets bottom="15.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="57.0" prefHeight="43.0" prefWidth="706.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Giờ bảo trì:" textAlignment="CENTER" wrappingWidth="74.93669724464417">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Text>
+            <TextField fx:id="txtTime" prefHeight="26.0" prefWidth="43.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </TextField>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ngày bảo trì:" textAlignment="CENTER" wrappingWidth="89.336690813303">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="145.0" />
+               </HBox.margin>
+            </Text>
+            <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="146.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </DatePicker>
+         </children>
+         <VBox.margin>
+            <Insets bottom="15.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Tần suất:" textAlignment="CENTER" wrappingWidth="72.53670310974121">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Text>
+            <ComboBox fx:id="comboBoxFrequency" prefHeight="26.0" prefWidth="102.0" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Kỹ thuật viên:" textAlignment="CENTER" wrappingWidth="90.93672752380371">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="100.0" />
+               </HBox.margin>
+            </Text>
+            <ComboBox fx:id="comboBoxExecutor" prefWidth="150.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </ComboBox>
+         </children>
+         <VBox.margin>
+            <Insets bottom="15.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="41.0" prefWidth="700.0">
+         <children>
+            <Button fx:id="btnSchedule" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleScheduleButton" text="Lập Lịch" textAlignment="CENTER">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+      <HBox alignment="TOP_CENTER" prefHeight="41.0" prefWidth="706.0">
+         <children>
+            <Label fx:id="lblMessage" text="Label" textAlignment="CENTER" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

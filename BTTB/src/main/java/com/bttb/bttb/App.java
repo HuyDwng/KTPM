@@ -18,9 +18,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("device_management"));
-        
+        scene = new Scene(loadFXML("maintenance_schedule"));
         stage.setScene(scene);
+        stage.sizeToScene(); //update size theo fxml
         stage.show();
     }
 
