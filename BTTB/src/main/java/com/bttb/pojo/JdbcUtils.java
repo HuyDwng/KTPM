@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class JdbcUtils {
     static {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
         }
     }
