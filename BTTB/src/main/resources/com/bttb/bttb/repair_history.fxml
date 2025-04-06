@@ -49,7 +49,7 @@
                                                     <Insets right="10.0" />
                                                 </HBox.margin>
                                             </Text>
-                                            <DatePicker prefHeight="26.0" prefWidth="161.0" />
+                                            <DatePicker fx:id="findStartDatePicker" prefHeight="26.0" prefWidth="161.0" />
                                         </children>
                                     </HBox>
                                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
@@ -59,7 +59,7 @@
                                                     <Insets right="10.0" />
                                                 </HBox.margin>
                                             </Text>
-                                            <DatePicker />
+                                            <DatePicker fx:id="findEndDatePicker" />
                                         </children>
                                     </HBox>
                                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" GridPane.rowIndex="1">
@@ -74,7 +74,7 @@
                                     </HBox>
                                     <HBox alignment="CENTER" prefHeight="50.0" prefWidth="770.0" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                         <children>
-                                            <Button prefHeight="26.0" prefWidth="54.0" text="Lưu" />
+                                            <Button onAction="#handleSearchRepairHistory" prefHeight="26.0" prefWidth="54.0" text="Tìm" />
                                         </children>
                                     </HBox>
                                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
@@ -123,7 +123,7 @@
                                     </HBox>
                                     <HBox alignment="CENTER" prefHeight="50.0" prefWidth="770.0" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                         <children>
-                                            <Button prefHeight="26.0" prefWidth="53.0" text="Lưu" onAction="#handleSaveRepairHistory"/>
+                                            <Button onAction="#handleSaveRepairHistory" prefHeight="26.0" prefWidth="53.0" text="Lưu" />
                                         </children>
                                     </HBox>
                                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
@@ -142,14 +142,13 @@
             <!-- Bảng hiển thị lịch sử hoạt động -->
             <TableView fx:id="tableRepairHistory" prefHeight="546.0" prefWidth="770.0">
                 <columns>
-                    <TableColumn fx:id="colId" prefWidth="67.20000916719437" text="ID" />
-                    <TableColumn fx:id="colDeviceId" prefWidth="79.20004272460938" text="Device ID" />
-                    <TableColumn fx:id="colTechnician" prefWidth="112.00007629394531" text="Technician" />
-                    <TableColumn fx:id="colRepairDate" prefWidth="133.5999755859375" text="Repair Date" />
-                    <TableColumn fx:id="colCompletionDate" prefWidth="123.19998168945312" text="Completion Date" />
-                    <TableColumn fx:id="colStatus" prefWidth="84.0" text="Status" />
-                    <TableColumn fx:id="colCost" minWidth="0.0" prefWidth="70.4000244140625" text="Cost" />
-                    <TableColumn fx:id="colAction" prefWidth="164.79996337890623" text="Hoàn Thành" />  <!-- Đây là cột chứa nút "Hoàn Thành" và "Xóa" -->
+                    <TableColumn fx:id="colDeviceId" prefWidth="102.39999085664749" text="Thiết bị" />
+                    <TableColumn fx:id="colTechnician" prefWidth="107.20001220703125" text="Kỹ thuật viên" />
+                    <TableColumn fx:id="colRepairDate" prefWidth="117.59999084472656" text="Ngày bắt đầu" />
+                    <TableColumn fx:id="colCompletionDate" prefWidth="134.4000244140625" text="Ngày hoàn thành" />
+                    <TableColumn fx:id="colStatus" prefWidth="100.79998779296875" text="Trạng thái" />
+                    <TableColumn fx:id="colCost" minWidth="0.0" prefWidth="114.4000244140625" text="Chi phí" />
+                    <TableColumn fx:id="colAction" prefWidth="161.59991455078125" text="Hành động" />  <!-- Đây là cột chứa nút "Hoàn Thành" và "Xóa" -->
                 </columns>
             </TableView>
 

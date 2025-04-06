@@ -18,6 +18,7 @@ import java.util.List;
  * @author LEGION
  */
 public class DeviceServices {
+
     public List<Device> getDevices() throws SQLException {
         List<Device> devices = new ArrayList<>();
         try (Connection conn = JdbcUtils.getConn()) {
@@ -33,19 +34,19 @@ public class DeviceServices {
             return devices;
         }
     }
-     public List<String> getDeviceIds() throws SQLException {
-        List<String> deviceIds = new ArrayList<>();
+
+    public List<String> getBrokenDevices() throws SQLException {
+        List<String> brokenDevices = new ArrayList<>();
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT id FROM device"; // Giả sử bảng thiết bị có tên là 'device'
+            String sql = "SELECT DISTINCT id FROM device WHERE status = 'Hỏng hóc'";
             PreparedStatement stm = conn.prepareStatement(sql);
             ResultSet rs = stm.executeQuery();
+
             while (rs.next()) {
-                deviceIds.add(rs.getString("id"));
+                brokenDevices.add(rs.getString("id"));
             }
         }
-        return deviceIds;
+        return brokenDevices;
     }
-   
-    
 
 }

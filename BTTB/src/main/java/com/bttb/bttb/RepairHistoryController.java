@@ -13,7 +13,9 @@ import javafx.scene.control.*;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -51,7 +53,13 @@ public class RepairHistoryController implements Initializable {
     private ComboBox<String> findDeviceComboBox;
     @FXML
     private DatePicker addRepairDatePicker;
+    @FXML
+    private DatePicker findStartDatePicker;
+    @FXML
+    private DatePicker findEndDatePicker;
 
+// Các cột khác
+    // Ngày hoàn thành
     private final RepairHistoryServices repairHistoryService = new RepairHistoryServices();
     private final UserServices userServices = new UserServices();
     private final DeviceServices deviceServices = new DeviceServices();
@@ -78,7 +86,7 @@ public class RepairHistoryController implements Initializable {
 
     private void loadDevices() {
         try {
-            List<String> deviceIds = deviceServices.getDeviceIds(); // Không gọi trực tiếp từ lớp
+            List<String> deviceIds = deviceServices.getBrokenDevices(); // Không gọi trực tiếp từ lớp
             ObservableList<String> deviceList = FXCollections.observableArrayList(deviceIds);
 
             addDeviceComboBox.setItems(deviceList);
@@ -93,7 +101,7 @@ public class RepairHistoryController implements Initializable {
     }
 
     private void setupTableColumns() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+
         colDeviceId.setCellValueFactory(new PropertyValueFactory<>("deviceId"));
         colTechnician.setCellValueFactory(new PropertyValueFactory<>("technician"));
         colRepairDate.setCellValueFactory(new PropertyValueFactory<>("repairDate"));
@@ -166,14 +174,17 @@ public class RepairHistoryController implements Initializable {
 
         // Chuyển đổi ngày từ String sang LocalDateTime nếu cần
         LocalDateTime repairDateTime = LocalDateTime.parse(repairDate + "T00:00:00"); // Ví dụ: chỉ lấy ngày, không có thời gian
-
+        if (isTechnicianBusy(technician)) {
+            showError("Kỹ thuật viên này đang có lịch sửa chữa chưa hoàn thành. Vui lòng chọn kỹ thuật viên khác.");
+            return;
+        }
         // Tạo đối tượng RepairHistory mới
         RepairHistory newRepair = new RepairHistory(
                 0, // 
                 Integer.parseInt(deviceId),
-                technician, // 
+                technician,
                 repairDateTime, // repairDate
-                null, 
+                null,
                 "Chưa hoàn thành", // status
                 0.0 // cost
         );
@@ -198,17 +209,51 @@ public class RepairHistoryController implements Initializable {
         }
     }
 
+    @FXML
+    private void handleSearchRepairHistory() {
+        // Lấy dữ liệu từ các ComboBox và DatePicker
+        String technician = findTechnicianComboBox.getValue();
+        String deviceId = findDeviceComboBox.getValue();
+        LocalDateTime startDate = findStartDatePicker.getValue() != null ? findStartDatePicker.getValue().atStartOfDay() : null;
+        LocalDateTime endDate = findEndDatePicker.getValue() != null ? findEndDatePicker.getValue().atTime(23, 59, 59) : null;
+        System.out.println("Parameters: " + technician + ", " + deviceId + ", " + startDate + ", " + endDate);
+
+        try {
+            // Sử dụng RepairHistoryServices để tìm kiếm với các tiêu chí
+            List<RepairHistory> searchResults = repairHistoryService.searchRepairHistory(technician, deviceId, startDate, endDate);
+
+            // Cập nhật dữ liệu vào bảng
+            tableRepairHistory.setItems(FXCollections.observableList(searchResults));
+
+            // Nếu không tìm thấy kết quả, thông báo cho người dùng
+            if (searchResults.isEmpty()) {
+                showError("Không có kết quả tìm kiếm khớp.");
+            }
+        } catch (SQLException e) {
+            showError("Lỗi khi tìm kiếm: " + e.getMessage());
+        }
+    }
+
     private void markAsCompleted(RepairHistory repair) {
         if (!"Đã hoàn thành".equals(repair.getStatus())) {
             try (Connection conn = JdbcUtils.getConn()) {
-                String sql = "UPDATE repair_history SET status = 'Đã hoàn thành', completion_date = NOW() WHERE id = ?";
+                String sql = "UPDATE repair_history SET status = ?, completion_date = ? WHERE id = ?";
                 PreparedStatement stm = conn.prepareStatement(sql);
-                stm.setInt(1, repair.getId());
-                stm.executeUpdate();
 
-                // Cập nhật lại dữ liệu trong TableView
-                repair.setStatus("Đã hoàn thành");
-                tableRepairHistory.refresh();
+                LocalDateTime now = LocalDateTime.now(); // Lấy thời gian hiện tại
+                stm.setString(1, "Đã hoàn thành");
+                stm.setTimestamp(2, Timestamp.valueOf(now));
+                stm.setInt(3, repair.getId());
+
+                int rowsUpdated = stm.executeUpdate();
+                if (rowsUpdated > 0) {
+                    // Cập nhật lại dữ liệu trong đối tượng RepairHistory
+                    repair.setStatus("Đã hoàn thành");
+                    repair.setCompletionDate(now);
+
+                    // Cập nhật giao diện
+                    loadRepairHistoryData(); // Load lại danh sách thay vì chỉ refresh
+                }
             } catch (SQLException e) {
                 showError("Lỗi cập nhật: " + e.getMessage());
             }
@@ -229,6 +274,22 @@ public class RepairHistoryController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private boolean isTechnicianBusy(String technician) {
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT COUNT(*) FROM repair_history WHERE technician = ? AND status = 'Chưa hoàn thành'";
+            PreparedStatement stm = conn.prepareStatement(sql);
+            stm.setString(1, technician);
+            ResultSet rs = stm.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+                return true; // Kỹ thuật viên đang có lịch sửa chữa chưa hoàn thành
+            }
+        } catch (SQLException e) {
+            showError("Lỗi kiểm tra lịch sửa chữa: " + e.getMessage());
+        }
+        return false; // Kỹ thuật viên không bận
     }
 
 }
