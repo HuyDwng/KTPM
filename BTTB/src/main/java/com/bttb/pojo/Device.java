@@ -8,7 +8,7 @@ public class Device {
     private int id;
     private String name;
     private String status;
-
+    private int deviceTypeId;
     public Device() {
     }
 
@@ -26,6 +26,13 @@ public class Device {
     public Device(String name, String status) {
         this.name = name;
         this.status = status;
+    }
+    
+     public Device(int id, String name, String status, int deviceTypeId) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.deviceTypeId = deviceTypeId;
     }
   
     public int getId() {
@@ -64,4 +71,18 @@ public class Device {
     public void setStatus(String status) {
         this.status = status;
     }
-}
+
+    /**
+     * @return the deviceTypeId
+     */
+    public int getDeviceTypeId() {
+        return deviceTypeId;
+    }
+
+    /**
+     * @param deviceTypeId the deviceTypeId to set
+     */
+    public void setDeviceTypeId(int deviceTypeId) {
+        this.deviceTypeId = deviceTypeId;
+    }
+}   

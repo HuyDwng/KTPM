@@ -1,7 +1,9 @@
 package com.bttb.bttb;
 
+import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
 import com.bttb.pojo.RepairHistory;
+import com.bttb.pojo.RepairIssue;
 import com.bttb.services.DeviceServices;
 import com.bttb.services.RepairHistoryServices;
 import com.bttb.services.UserServices;
@@ -9,16 +11,22 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.SelectionMode;
 
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -33,6 +41,8 @@ public class RepairHistoryController implements Initializable {
     private TableColumn<RepairHistory, Integer> colDeviceId;
     @FXML
     private TableColumn<RepairHistory, String> colTechnician;
+    @FXML
+    private TableColumn<RepairHistory, String> colRepairIssue;
     @FXML
     private TableColumn<RepairHistory, String> colRepairDate;
     @FXML
@@ -57,6 +67,14 @@ public class RepairHistoryController implements Initializable {
     private DatePicker findStartDatePicker;
     @FXML
     private DatePicker findEndDatePicker;
+    @FXML
+    private TableView<RepairIssue> tableIssueList;
+
+    @FXML
+    private TableColumn<RepairIssue, String> issueColumn;
+
+    @FXML
+    private TableColumn<RepairIssue, Double> costColumn;
 
 // Các cột khác
     // Ngày hoàn thành
@@ -66,10 +84,15 @@ public class RepairHistoryController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        tableIssueList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setupTableColumns();
         loadRepairHistoryData();
         loadTechnicians();
         loadDevices();
+        addDeviceComboBox.setOnAction(event -> handleDeviceSelection());
+        issueColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
+        costColumn.setCellValueFactory(data -> new SimpleDoubleProperty(data.getValue().getCost()).asObject());
+
     }
 
     private void loadTechnicians() {
@@ -81,6 +104,41 @@ public class RepairHistoryController implements Initializable {
 
         } catch (SQLException e) {
             showError("Lỗi khi tải danh sách kỹ thuật viên: " + e.getMessage());
+        }
+    }
+
+    private void handleDeviceSelection() {
+        String selectedDeviceId = addDeviceComboBox.getSelectionModel().getSelectedItem();
+        if (selectedDeviceId != null && !selectedDeviceId.isEmpty()) {
+            loadRepairIssuesForDevice(selectedDeviceId);
+        }
+    }
+
+    private void loadRepairIssuesForDevice(String deviceId) {
+        ObservableList<RepairIssue> issues = FXCollections.observableArrayList();
+
+        String sql = "SELECT ri.id, ri.name, ri.cost, ri.device_type_id FROM device d "
+                + "JOIN repair_issue ri ON d.device_type_id = ri.device_type_id "
+                + "WHERE d.id = ?";
+
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setString(1, deviceId);
+            ResultSet rs = stm.executeQuery();
+
+            while (rs.next()) {
+                RepairIssue issue = new RepairIssue(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("device_type_id"),
+                        rs.getDouble("cost")
+                );
+                issues.add(issue);
+            }
+
+            tableIssueList.setItems(issues);
+
+        } catch (SQLException e) {
+            showError("Lỗi khi tải danh sách lỗi: " + e.getMessage());
         }
     }
 
@@ -101,9 +159,14 @@ public class RepairHistoryController implements Initializable {
     }
 
     private void setupTableColumns() {
-
         colDeviceId.setCellValueFactory(new PropertyValueFactory<>("deviceId"));
         colTechnician.setCellValueFactory(new PropertyValueFactory<>("technician"));
+        colRepairIssue.setCellValueFactory(cellData -> {
+            List<String> repairIssues = cellData.getValue().getRepairIssue();
+            // Chuyển danh sách thành chuỗi, phân tách bằng dấu phẩy
+            String issues = String.join(", ", repairIssues);
+            return new SimpleStringProperty(issues); // Trả về chuỗi cho cột
+        });
         colRepairDate.setCellValueFactory(new PropertyValueFactory<>("repairDate"));
         colCompletionDate.setCellValueFactory(new PropertyValueFactory<>("CompletionDate"));
         colCost.setCellValueFactory(new PropertyValueFactory<>("cost"));
@@ -138,72 +201,106 @@ public class RepairHistoryController implements Initializable {
                     HBox hbox = new HBox(10, btnComplete, btnDelete); // Hiển thị cả 2 nút
                     setGraphic(hbox);
                     // Disable nút "Hoàn Thành" nếu trạng thái là "Đã hoàn thành"
-                    btnComplete.setDisable("Đã hoàn thành".equals(getTableView().getItems().get(getIndex()).getStatus()));
+                    btnComplete.setDisable("Hoàn thành".equals(getTableView().getItems().get(getIndex()).getStatus()));
                 }
             }
         });
     }
 
     private void deleteRepairHistory(RepairHistory repair) {
-        try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "DELETE FROM repair_history WHERE id = ?";
-            PreparedStatement stm = conn.prepareStatement(sql);
-            stm.setInt(1, repair.getId());
-            stm.executeUpdate();
-
-            // Xóa sửa chữa khỏi danh sách và làm mới TableView
-            tableRepairHistory.getItems().remove(repair);
-            tableRepairHistory.refresh();
-        } catch (SQLException e) {
-            showError("Lỗi khi xóa dữ liệu: " + e.getMessage());
+        if ("Hoàn thành".equalsIgnoreCase(repair.getStatus())) {
+            showError("Không thể xóa lịch sửa chữa đã hoàn thành.");
+            return;
         }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Bạn có chắc muốn xóa?", ButtonType.OK, ButtonType.CANCEL);
+        alert.setTitle("Xác nhận");
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try (Connection conn = JdbcUtils.getConn()) {
+                    conn.setAutoCommit(false); // Bắt đầu transaction
+
+                    // Xóa bản ghi con trước
+                    String deleteIssues = "DELETE FROM repair_history_repair_issue WHERE repair_history_id = ?";
+                    try (PreparedStatement stm1 = conn.prepareStatement(deleteIssues)) {
+                        stm1.setInt(1, repair.getId());
+                        stm1.executeUpdate();
+                    }
+
+                    // Xóa bản ghi chính
+                    String deleteRepair = "DELETE FROM repair_history WHERE id = ?";
+                    try (PreparedStatement stm2 = conn.prepareStatement(deleteRepair)) {
+                        stm2.setInt(1, repair.getId());
+                        stm2.executeUpdate();
+                    }
+
+                    conn.commit(); // Xác nhận thay đổi
+
+                    tableRepairHistory.getItems().remove(repair);
+                } catch (SQLException e) {
+                    showError("Lỗi khi xóa: " + e.getMessage());
+                }
+            }
+        });
     }
 
     @FXML
-    private void handleSaveRepairHistory() {
-        // Lấy dữ liệu từ các trường nhập liệu
+    private void handleAddRepairHistory() {
         String technician = addTechnicianComboBox.getValue();
         String deviceId = addDeviceComboBox.getValue();
         String repairDate = addRepairDatePicker.getValue() != null ? addRepairDatePicker.getValue().toString() : null;
 
-        // Kiểm tra nếu tất cả các trường đều có dữ liệu hợp lệ
         if (technician == null || technician.isEmpty() || deviceId == null || repairDate == null) {
             showError("Vui lòng điền đầy đủ thông tin.");
             return;
         }
+//        if (isTechnicianBusy(technician)) {
+//            showError("Kỹ thuật viên này đang có lịch sửa chữa chưa hoàn thành. Vui lòng chọn kỹ thuật viên khác.");
+//            return;
+//        }
+        LocalDateTime repairDateTime = LocalDateTime.parse(repairDate + "T00:00:00");
 
-        // Chuyển đổi ngày từ String sang LocalDateTime nếu cần
-        LocalDateTime repairDateTime = LocalDateTime.parse(repairDate + "T00:00:00"); // Ví dụ: chỉ lấy ngày, không có thời gian
-        if (isTechnicianBusy(technician)) {
-            showError("Kỹ thuật viên này đang có lịch sửa chữa chưa hoàn thành. Vui lòng chọn kỹ thuật viên khác.");
+        // Lấy danh sách lỗi được chọn
+        ObservableList<RepairIssue> selectedIssues = tableIssueList.getSelectionModel().getSelectedItems();
+        if (selectedIssues == null || selectedIssues.isEmpty()) {
+            showError("Vui lòng chọn ít nhất một lỗi để sửa.");
             return;
         }
-        // Tạo đối tượng RepairHistory mới
+
+        // Tính tổng chi phí
+        double totalCost = selectedIssues.stream().mapToDouble(RepairIssue::getCost).sum();
+        for (RepairIssue issue : selectedIssues) {
+            System.out.println("Lỗi: " + issue.getName() + " | Chi phí: " + issue.getCost());
+        }
+        System.out.println("Tổng chi phí tính được: " + totalCost);
+
+        // Lấy tên lỗi để truyền vào constructor (nếu class RepairHistory cần)
+        List<String> issueNames = selectedIssues.stream()
+                .map(RepairIssue::getName)
+                .collect(Collectors.toList());
+
         RepairHistory newRepair = new RepairHistory(
-                0, // 
+                0,
                 Integer.parseInt(deviceId),
                 technician,
-                repairDateTime, // repairDate
+                issueNames, // Nếu constructor của bạn cần List<String>
+                repairDateTime,
                 null,
-                "Chưa hoàn thành", // status
-                0.0 // cost
+                "Chưa hoàn thành",
+                totalCost
         );
 
-        // Lưu vào cơ sở dữ liệu
-        try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "INSERT INTO repair_history (technician, device_id, repair_date, status, cost) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement stm = conn.prepareStatement(sql);
-            stm.setString(1, newRepair.getTechnician());
-            stm.setInt(2, newRepair.getDeviceId());
-            stm.setObject(3, newRepair.getRepairDate()); // LocalDateTime
-            stm.setString(4, newRepair.getStatus()); // Chắc chắn dùng giá trị status đúng
-            System.out.println("Status: " + newRepair.getStatus());
-            stm.setDouble(5, newRepair.getCost());
-            stm.executeUpdate();
+        // Gọi service
+        try {
+            RepairHistoryServices service = new RepairHistoryServices();
+            boolean success = service.addRepairHistory(newRepair, new ArrayList<>(selectedIssues));
 
-            // Làm mới lại dữ liệu TableView sau khi thêm
-            loadRepairHistoryData();  // Load lại danh sách lịch sử sửa chữa
-
+            if (success) {
+                showInfo("Thêm lịch sửa chữa thành công!");
+                loadRepairHistoryData();
+            } else {
+                showError("Không thể thêm lịch sửa chữa.");
+            }
         } catch (SQLException e) {
             showError("Lỗi khi lưu lịch sử sửa chữa: " + e.getMessage());
         }
@@ -211,44 +308,56 @@ public class RepairHistoryController implements Initializable {
 
     @FXML
     private void handleSearchRepairHistory() {
-        // Lấy dữ liệu từ các ComboBox và DatePicker
-        String technician = findTechnicianComboBox.getValue();
-        String deviceId = findDeviceComboBox.getValue();
-        LocalDateTime startDate = findStartDatePicker.getValue() != null ? findStartDatePicker.getValue().atStartOfDay() : null;
-        LocalDateTime endDate = findEndDatePicker.getValue() != null ? findEndDatePicker.getValue().atTime(23, 59, 59) : null;
-        System.out.println("Parameters: " + technician + ", " + deviceId + ", " + startDate + ", " + endDate);
+//        // Lấy dữ liệu từ các ComboBox và DatePicker
+//        String technician = findTechnicianComboBox.getValue();
+//        String deviceId = findDeviceComboBox.getValue();
+//        LocalDateTime startDate = findStartDatePicker.getValue() != null ? findStartDatePicker.getValue().atStartOfDay() : null;
+//        LocalDateTime endDate = findEndDatePicker.getValue() != null ? findEndDatePicker.getValue().atTime(23, 59, 59) : null;
+//        System.out.println("Parameters: " + technician + ", " + deviceId + ", " + startDate + ", " + endDate);
+//
+//        try {
+//            // Sử dụng RepairHistoryServices để tìm kiếm với các tiêu chí
+//            List<RepairHistory> searchResults = repairHistoryService.searchRepairHistory(technician, deviceId, startDate, endDate);
+//
+//            // Cập nhật dữ liệu vào bảng
+//            tableRepairHistory.setItems(FXCollections.observableList(searchResults));
+//
+//            // Nếu không tìm thấy kết quả, thông báo cho người dùng
+//            if (searchResults.isEmpty()) {
+//                showError("Không có kết quả tìm kiếm khớp.");
+//            }
+//        } catch (SQLException e) {
+//            showError("Lỗi khi tìm kiếm: " + e.getMessage());
+//        }
+    }
 
-        try {
-            // Sử dụng RepairHistoryServices để tìm kiếm với các tiêu chí
-            List<RepairHistory> searchResults = repairHistoryService.searchRepairHistory(technician, deviceId, startDate, endDate);
-
-            // Cập nhật dữ liệu vào bảng
-            tableRepairHistory.setItems(FXCollections.observableList(searchResults));
-
-            // Nếu không tìm thấy kết quả, thông báo cho người dùng
-            if (searchResults.isEmpty()) {
-                showError("Không có kết quả tìm kiếm khớp.");
+    private void addRepairHistoryIssues(Connection conn, int repairHistoryId, ObservableList<RepairIssue> issues) throws SQLException {
+        String sql = "INSERT INTO repair_history_repair_issue (repair_history_id, repair_issue_id) VALUES (?, ?)";
+        try (PreparedStatement stm = conn.prepareStatement(sql)) {
+            for (RepairIssue issue : issues) {
+                stm.setInt(1, repairHistoryId);
+                stm.setInt(2, issue.getId());
+                stm.addBatch();
             }
-        } catch (SQLException e) {
-            showError("Lỗi khi tìm kiếm: " + e.getMessage());
+            stm.executeBatch(); // Thực thi hàng loạt để tăng hiệu suất
         }
     }
 
     private void markAsCompleted(RepairHistory repair) {
-        if (!"Đã hoàn thành".equals(repair.getStatus())) {
+        if (!"Hoàn thành".equals(repair.getStatus())) {
             try (Connection conn = JdbcUtils.getConn()) {
                 String sql = "UPDATE repair_history SET status = ?, completion_date = ? WHERE id = ?";
                 PreparedStatement stm = conn.prepareStatement(sql);
 
                 LocalDateTime now = LocalDateTime.now(); // Lấy thời gian hiện tại
-                stm.setString(1, "Đã hoàn thành");
+                stm.setString(1, "Hoàn thành");
                 stm.setTimestamp(2, Timestamp.valueOf(now));
                 stm.setInt(3, repair.getId());
 
                 int rowsUpdated = stm.executeUpdate();
                 if (rowsUpdated > 0) {
                     // Cập nhật lại dữ liệu trong đối tượng RepairHistory
-                    repair.setStatus("Đã hoàn thành");
+                    repair.setStatus("Hoàn thành");
                     repair.setCompletionDate(now);
 
                     // Cập nhật giao diện
@@ -262,10 +371,25 @@ public class RepairHistoryController implements Initializable {
 
     private void loadRepairHistoryData() {
         try {
-            tableRepairHistory.setItems(FXCollections.observableList(repairHistoryService.getRepairHistories()));
+            List<RepairHistory> repairHistories = repairHistoryService.getRepairHistories();
+
+            // Kiểm tra nếu repairHistories không phải null và không rỗng
+            if (repairHistories != null && !repairHistories.isEmpty()) {
+                tableRepairHistory.setItems(FXCollections.observableList(repairHistories));
+            } else {
+                showError("Không có dữ liệu lịch sửa chữa để hiển thị.");
+            }
         } catch (SQLException e) {
             showError("Lỗi khi tải dữ liệu lịch sửa chữa: " + e.getMessage());
         }
+    }
+
+    private void showInfo(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Thông báo");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void showError(String message) {
@@ -278,7 +402,7 @@ public class RepairHistoryController implements Initializable {
 
     private boolean isTechnicianBusy(String technician) {
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT COUNT(*) FROM repair_history WHERE technician = ? AND status = 'Chưa hoàn thành'";
+            String sql = "SELECT COUNT(*) FROM repair_history WHERE technician_id = ? AND status = 'Chưa hoàn thành'";
             PreparedStatement stm = conn.prepareStatement(sql);
             stm.setString(1, technician);
             ResultSet rs = stm.executeQuery();

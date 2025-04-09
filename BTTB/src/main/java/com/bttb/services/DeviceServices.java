@@ -59,6 +59,22 @@ public class DeviceServices {
             return devices;
         }
     }
+    
+    public List<Device> getDevicesForRepair() throws SQLException {
+        List<Device> devices = new ArrayList<>();
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT * FROM device";
+            PreparedStatement stm = conn.prepareCall(sql);
+
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"), rs.getInt("device_type_id"));
+                devices.add(d);
+            }
+
+            return devices;
+        }
+    }
 
 //    public List<Device> getAllDevices() {
 //        List<Device> devices = new ArrayList<>();
