@@ -2,6 +2,7 @@ package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.EmailUtils;
+import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.net.URL;
 import java.sql.SQLException;
@@ -26,7 +27,7 @@ public class MaintenanceScheduleController implements Initializable {
     @FXML
     private ComboBox<String> comboBoxFrequency;
     @FXML
-    private ComboBox<String> comboBoxExecutor;
+    private ComboBox<User> comboBoxExecutor;
     @FXML
     private DatePicker datePicker;
     @FXML
@@ -41,7 +42,6 @@ public class MaintenanceScheduleController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         lblMessage.setVisible(false);
         setupDatePicker();
         setupTimeField();
@@ -203,7 +203,7 @@ public class MaintenanceScheduleController implements Initializable {
     }
 
     public void loadExecutors() {
-        ObservableList<String> executors = ScheduleServices.loadExecutors();
+        ObservableList<User> executors = ss.loadExecutors();
         comboBoxExecutor.setItems(executors);
     }
 
@@ -219,52 +219,51 @@ public class MaintenanceScheduleController implements Initializable {
             return;
         }
 
-//        if (scheduleService.addMaintenanceSchedule(...)) {
-//            showSuccess("Lập lịch thành công!");
-//
-//            // Gửi email
-//            String executorEmail = ScheduleServices.getEmailByExecutorName(selectedExecutor);
-//            if (executorEmail != null) {
-//                EmailUtils.sendEmail(executorEmail,
-//                        "Thông báo lịch bảo trì",
-//                        String.format("Bạn được phân công bảo trì thiết bị '%s' vào lúc %s %s.",
-//                                selectedDevice.getName(),
-//                                selectedDate.toString(),
-//                                selectedTime.toString())
-//                );
-//            }
-//
-//        } else {
-//            showError("Lưu lịch bảo trì thất bại!");
-//        }
+        LocalDate selectedDate = datePicker.getValue();
+        LocalTime selectedTime = LocalTime.parse(txtTime.getText());
+        String selectedFrequency = comboBoxFrequency.getSelectionModel().getSelectedItem();
+        User selectedUser = (User) comboBoxExecutor.getValue();
+        int executorId = selectedUser.getId();
+        String executorName = selectedUser.toString();
 
         try {
-            LocalDate selectedDate = datePicker.getValue();
-            LocalTime selectedTime = LocalTime.parse(txtTime.getText());
-            String selectedFrequency = comboBoxFrequency.getSelectionModel().getSelectedItem();
-            String selectedExecutor = comboBoxExecutor.getSelectionModel().getSelectedItem();
-
             if (selectedDate == null || selectedTime == null) {
                 showError("Vui lòng nhập ngày và giờ hợp lệ!");
                 return;
             }
 
             LocalDateTime scheduleDateTime = LocalDateTime.of(selectedDate, selectedTime);
-          
+
             if (scheduleDateTime.isBefore(LocalDateTime.now())) {
                 showError("Thời gian lập lịch phải ở tương lai!");
                 return;
             }
 
-            ScheduleServices scheduleService = new ScheduleServices();
-
-            if (scheduleService.isScheduleDuplicate(selectedDevice.getId(), scheduleDateTime)) {
+            if (ss.isScheduleDuplicate(selectedDevice.getId(), scheduleDateTime)) {
                 showError("Lịch bảo trì đã tồn tại vào thời gian này!");
                 return;
             }
 
-            if (scheduleService.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime, selectedFrequency, selectedExecutor)) {
+            if (ss.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime, selectedFrequency, executorId)) {
                 showSuccess("Lập lịch thành công!");
+                
+                String toEmail = ScheduleServices.getExecutorEmail(executorId);
+
+                String subject = "Thông báo lập lịch bảo trì thiết bị";
+                String content = String.format(
+                        "Thiết bị '%s' đã được lập lịch bảo trì vào lúc %s %s, với tần suất: %s.\nNgười thực hiện: %s.",
+                        selectedDevice.getName(),
+                        selectedDate.toString(),
+                        selectedTime.toString(),
+                        selectedFrequency,
+                        executorName
+                );
+
+                boolean emailSent = EmailUtils.sendEmail(toEmail, subject, content);
+                if (!emailSent) {
+                    showError("Lập lịch thành công nhưng gửi email thất bại!");
+                }
+
             } else {
                 showError("Lưu lịch bảo trì thất bại!");
             }

@@ -27,7 +27,16 @@ public class User {
         this.username = username;
         this.password = password;
         this.role = role;
-        
+    }
+
+    public User(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return id + " - " + name;
     }
 
     /**
@@ -99,5 +108,4 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
-
 }

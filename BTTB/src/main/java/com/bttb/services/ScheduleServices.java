@@ -2,6 +2,7 @@ package com.bttb.services;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
+import com.bttb.pojo.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,50 +46,54 @@ public class ScheduleServices {
         );
     }
 
-    // Phương thức load danh sách người thực hiện từ cơ sở dữ liệu
-    public static ObservableList<String> loadExecutors() {
-        ObservableList<String> executors = FXCollections.observableArrayList();
+    // Phương thức load danh sách người thực hiện là kỹ thuật viên từ cơ sở dữ liệu
+    public static ObservableList<User> loadExecutors() {
+        ObservableList<User> executors = FXCollections.observableArrayList();
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT * FROM user";
+            String sql = "SELECT id, name FROM user WHERE role = 'technician'";
             PreparedStatement stm = conn.prepareCall(sql);
             ResultSet rs = stm.executeQuery();
 
             while (rs.next()) {
-                executors.add(rs.getString("name"));
+                executors.add(new User(rs.getInt("id"), rs.getString("name")));
             }
 
         } catch (SQLException e) {
-            // Nếu có lỗi kết nối hay truy vấn, bạn có thể hiển thị thông báo lỗi
             System.err.println("Error loading executors: " + e.getMessage());
         }
 
-        return executors;  // Trả về danh sách người thực hiện
+        return executors;
     }
 
     // 🔹 Thêm lịch bảo trì mới vào database
-    public boolean addMaintenanceSchedule(int deviceId, LocalDate scheduleDate, LocalTime scheduleTime, String frequency, String executor) throws SQLException {
-        String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor) VALUES (?, ?, ?, ?, ?)";
+    public boolean addMaintenanceSchedule(int deviceId, LocalDate scheduleDate, LocalTime scheduleTime, String frequency, int executorId) throws SQLException {
+        String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
             stm.setInt(1, deviceId);
             stm.setDate(2, Date.valueOf(scheduleDate));
             stm.setTime(3, Time.valueOf(scheduleTime));
             stm.setString(4, frequency);
-            stm.setString(5, executor);
-            return stm.executeUpdate() > 0; // Trả về true nếu thêm thành công
+            stm.setInt(5, executorId);
+            return stm.executeUpdate() > 0;
         }
     }
 
-    public static String getEmailByExecutorName(String name) {
-        String sql = "SELECT email FROM users WHERE name = ?";
-        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            ResultSet rs = stmt.executeQuery();
+    public static String getExecutorEmail(int executorId) {
+        String email = null;
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT email FROM user WHERE id = ?";
+            PreparedStatement stm = conn.prepareStatement(sql);
+            stm.setInt(1, executorId);
+            ResultSet rs = stm.executeQuery();
+
             if (rs.next()) {
-                return rs.getString("email");
+                email = rs.getString("email");
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error retrieving executor email: " + e.getMessage());
         }
-        return null;
+
+        return email;
     }
 }
