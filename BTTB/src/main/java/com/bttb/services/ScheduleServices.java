@@ -65,15 +65,16 @@ public class ScheduleServices {
         return executors;
     }
 
-    // 🔹 Thêm lịch bảo trì mới vào database
-    public boolean addMaintenanceSchedule(int deviceId, LocalDate scheduleDate, LocalTime scheduleTime, String frequency, int executorId) throws SQLException {
-        String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor_id) VALUES (?, ?, ?, ?, ?)";
+    // Thêm lịch bảo trì mới vào database
+    public boolean addMaintenanceSchedule(int deviceId, LocalDate scheduleDate, LocalTime scheduleTime, String frequency, int executorId, LocalDate nextMaintenanceDate) throws SQLException {
+        String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor_id, next_maintenance_date) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
             stm.setInt(1, deviceId);
             stm.setDate(2, Date.valueOf(scheduleDate));
             stm.setTime(3, Time.valueOf(scheduleTime));
             stm.setString(4, frequency);
             stm.setInt(5, executorId);
+            stm.setDate(6, Date.valueOf(nextMaintenanceDate));
             return stm.executeUpdate() > 0;
         }
     }
