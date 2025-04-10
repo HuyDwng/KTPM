@@ -1,4 +1,4 @@
-<!--<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -35,11 +35,24 @@
                   <Insets />
                </HBox.margin>
             </Text>
-            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="306.0">
+            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="214.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
             </ComboBox>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hạn bảo trì:" textAlignment="CENTER" wrappingWidth="89.336690813303">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Text>
+            <DatePicker fx:id="deadlinePicker" prefHeight="30.0" prefWidth="105.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </DatePicker>
          </children>
          <VBox.margin>
             <Insets bottom="15.0" />
@@ -68,7 +81,7 @@
                   <Insets left="145.0" />
                </HBox.margin>
             </Text>
-            <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="146.0">
+            <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="105.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
@@ -97,7 +110,7 @@
                   <Insets left="100.0" />
                </HBox.margin>
             </Text>
-            <ComboBox fx:id="comboBoxExecutor" prefWidth="150.0">
+            <ComboBox fx:id="comboBoxExecutor" prefHeight="26.0" prefWidth="145.0">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
