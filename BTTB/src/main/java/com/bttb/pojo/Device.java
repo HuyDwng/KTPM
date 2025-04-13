@@ -4,7 +4,6 @@
  */
 package com.bttb.pojo;
 
-
 public class Device {
     private int id;
     private String name;
@@ -48,6 +47,7 @@ public class Device {
     public void setDevice_type_id(int device_type_id) {
         this.device_type_id = device_type_id;
     }
+  
     public Device() {
     }
 
@@ -57,14 +57,21 @@ public class Device {
         this.status = status;
     }
 
+    @Override
+    public String toString() {
+        return id + " - " + name;
+    }
+    
     public Device(String name, String status) {
         this.name = name;
         this.status = status;
     }
-
-    @Override
-    public String toString() {
-        return id + " - " + name;  // Hiển thị dạng "1 - Laptop"
+    
+     public Device(int id, String name, String status, int deviceTypeId) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.deviceTypeId = deviceTypeId;
     }
   
     public int getId() {
@@ -90,7 +97,6 @@ public class Device {
     public void setName(String name) {
         this.name = name;
     }
-
     /**
      * @return the status
      */
@@ -104,4 +110,18 @@ public class Device {
     public void setStatus(String status) {
         this.status = status;
     }
-}
+
+    /**
+     * @return the deviceTypeId
+     */
+    public int getDeviceTypeId() {
+        return deviceTypeId;
+    }
+
+    /**
+     * @param deviceTypeId the deviceTypeId to set
+     */
+    public void setDeviceTypeId(int deviceTypeId) {
+        this.deviceTypeId = deviceTypeId;
+    }
+}   

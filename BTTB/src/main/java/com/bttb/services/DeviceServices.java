@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.bttb.services;
 
 import com.bttb.bttb.Device_managementController;
@@ -13,6 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -109,6 +108,67 @@ public class DeviceServices {
             e.printStackTrace();
         }
         return false;
+
+    public List<Device> getDevicesForRepair() throws SQLException {
+        List<Device> devices = new ArrayList<>();
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT * FROM device";
+            PreparedStatement stm = conn.prepareCall(sql);
+
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"), rs.getInt("device_type_id"));
+                devices.add(d);
+            }
+
+            return devices;
+        }
+    }
+
+//    public List<Device> getAllDevices() {
+//        List<Device> devices = new ArrayList<>();
+//        String sql = "SELECT id, name, status FROM device";
+//
+//        try (Connection conn = JdbcUtils.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+//
+//            while (rs.next()) {
+//                Device device = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"));
+//                devices.add(device);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return devices;
+//    }
+    public List<Device> getBrokenDevices() throws SQLException {
+        List<Device> devices = new ArrayList<>();
+
+        Connection conn = JdbcUtils.getConn();
+        String sql = "SELECT id, name, status FROM device WHERE status = 'Hỏng hóc'";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"));
+            devices.add(d);
+        }
+
+        return devices;
+    }
+
+    public Device getDeviceById(int id) throws SQLException {
+        Connection conn = JdbcUtils.getConn();
+        String sql = "SELECT * FROM device WHERE id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, id); // ⚠️ thêm dòng này để gán giá trị id
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            return new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"));
+        }
+
+        return null; // nếu không tìm thấy
     }
 
     public boolean updateDeviceStatus(int deviceId, String newStatus) {
@@ -136,7 +196,7 @@ public class DeviceServices {
             return rowsAffected > 0; // Nếu xóa thành công, trả về true
         } catch (SQLException e) {
             e.printStackTrace();
-            return false; // Nếu có lỗi xảy ra, trả về false
+            return false;
         }
     }
 }

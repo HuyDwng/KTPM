@@ -13,7 +13,14 @@ public class DeviceType {
         this.name = name;
     }
 
-    public DeviceType() {}
+    public DeviceType(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 
     public int getId() {
         return id;
@@ -30,11 +37,4 @@ public class DeviceType {
     public void setName(String name) {
         this.name = name;
     }
-
-    // Hiển thị tên trong ComboBox
-    @Override
-    public String toString() {
-        return name;
-    }
 }
-
