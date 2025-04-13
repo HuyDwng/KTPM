@@ -2,6 +2,7 @@ package com.bttb.services;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
+import com.bttb.pojo.MaintenanceSchedule;
 import com.bttb.pojo.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,10 +10,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,20 +21,13 @@ import javafx.collections.ObservableList;
 public class ScheduleServices {
 
     // 🔹 Kiểm tra trùng lịch bảo trì
-    public boolean isScheduleDuplicate(int deviceId, LocalDateTime scheduleTime) throws SQLException {
-        String query = "SELECT COUNT(*) FROM maintenance_schedule WHERE device_id = ? AND scheduled_time = ?";
-
-        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
-            stm.setInt(1, deviceId);
-            stm.setTimestamp(2, Timestamp.valueOf(scheduleTime));
-
-            try (ResultSet rs = stm.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
+    public boolean isScheduleDuplicate(int deviceId) throws SQLException {
+        Connection conn = JdbcUtils.getConn();
+        String sql = "SELECT * FROM maintenance_schedule WHERE device_id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, deviceId);
+        ResultSet rs = stmt.executeQuery();
+        return rs.next();
     }
 
     // 🔹 Lọc danh sách thiết bị có trạng thái "Đang hoạt động"
@@ -97,4 +91,49 @@ public class ScheduleServices {
 
         return email;
     }
+
+    public ObservableList<MaintenanceSchedule> getAllSchedules() throws SQLException {
+        ObservableList<MaintenanceSchedule> list = FXCollections.observableArrayList();
+
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT ms.id, d.name AS device_name, u.name AS executor_name, "
+                    + "ms.scheduled_date, ms.scheduled_time, ms.frequency, "
+                    + "ms.next_maintenance_date, ms.created_at "
+                    + "FROM maintenance_schedule ms "
+                    + "JOIN device d ON ms.device_id = d.id "
+                    + "JOIN user u ON ms.executor_id = u.id "
+                    + "ORDER BY ms.scheduled_date DESC";
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                MaintenanceSchedule m = new MaintenanceSchedule(
+                        rs.getInt("id"),
+                        rs.getString("device_name"),
+                        rs.getString("executor_name"),
+                        rs.getDate("scheduled_date").toLocalDate(),
+                        rs.getTime("scheduled_time").toLocalTime(),
+                        rs.getString("frequency"),
+                        rs.getDate("next_maintenance_date") != null ? rs.getDate("next_maintenance_date").toLocalDate() : null,
+                        rs.getDate("created_at") != null ? rs.getDate("created_at").toLocalDate() : null
+                );
+
+                list.add(m);
+            }
+        }
+
+        return list;
+    }
+
+    public boolean deleteSchedule(int id) throws SQLException {
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "DELETE FROM maintenance_schedule WHERE id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        }
+    }
+
 }

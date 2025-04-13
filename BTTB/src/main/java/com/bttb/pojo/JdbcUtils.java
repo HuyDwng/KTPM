@@ -7,12 +7,12 @@ import java.sql.SQLException;
 public class JdbcUtils {
     static {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
         }
     }
     
     public static Connection getConn() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/bttb", "root", "huyduong2004");
+        return DriverManager.getConnection("jdbc:mysql://localhost/bttbdb", "root", "huyduong2004");
     }
 }

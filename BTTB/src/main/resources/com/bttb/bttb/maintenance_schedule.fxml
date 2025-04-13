@@ -5,134 +5,183 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="337.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
-   <children>
-      <HBox alignment="CENTER" prefHeight="55.0" prefWidth="707.0">
-         <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Lập Lịch Bảo Trì" textAlignment="CENTER" wrappingWidth="706.9394378662109">
-               <font>
-                  <Font size="35.0" />
-               </font>
-               <HBox.margin>
-                  <Insets bottom="10.0" />
-               </HBox.margin>
-            </Text>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
-         <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Chọn Thiết Bị:" textAlignment="CENTER" wrappingWidth="94.13670921325684">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </Text>
-            <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="214.0">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
-            </ComboBox>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hạn bảo trì:" textAlignment="CENTER" wrappingWidth="89.336690813303">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets left="20.0" />
-               </HBox.margin>
-            </Text>
-            <DatePicker fx:id="deadlinePicker" prefHeight="30.0" prefWidth="105.0">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
-            </DatePicker>
-         </children>
-         <VBox.margin>
-            <Insets bottom="15.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="57.0" prefHeight="43.0" prefWidth="706.0">
-         <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Giờ bảo trì:" textAlignment="CENTER" wrappingWidth="74.93669724464417">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </Text>
-            <TextField fx:id="txtTime" prefHeight="26.0" prefWidth="43.0">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
-            </TextField>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ngày bảo trì:" textAlignment="CENTER" wrappingWidth="89.336690813303">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets left="145.0" />
-               </HBox.margin>
-            </Text>
-            <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="105.0">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
-            </DatePicker>
-         </children>
-         <VBox.margin>
-            <Insets bottom="15.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
-         <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Tần suất:" textAlignment="CENTER" wrappingWidth="72.53670310974121">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </Text>
-            <ComboBox fx:id="comboBoxFrequency" prefHeight="26.0" prefWidth="102.0" />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Kỹ thuật viên:" textAlignment="CENTER" wrappingWidth="90.93672752380371">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets left="100.0" />
-               </HBox.margin>
-            </Text>
-            <ComboBox fx:id="comboBoxExecutor" prefHeight="26.0" prefWidth="145.0">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
-            </ComboBox>
-         </children>
-         <VBox.margin>
-            <Insets bottom="15.0" />
-         </VBox.margin>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="41.0" prefWidth="700.0">
-         <children>
-            <Button fx:id="btnSchedule" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleScheduleButton" text="Lập Lịch" textAlignment="CENTER">
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </Button>
-         </children>
-      </HBox>
-      <HBox alignment="TOP_CENTER" prefHeight="41.0" prefWidth="706.0">
-         <children>
-            <Label fx:id="lblMessage" text="Label" textAlignment="CENTER" />
-         </children>
-      </HBox>
-   </children>
-</VBox>
+<TabPane fx:id="tabPane" prefHeight="419.0" prefWidth="955.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
+
+    <tabs>
+        <!-- Tab Lập lịch -->
+        <Tab closable="false" text="Lập lịch">
+            <content>
+                <VBox fx:id="rootVBox" prefHeight="337.0" prefWidth="700.0">
+                    <children>
+                        <!-- Phần VBox gốc bạn đã có -->
+                        <HBox alignment="CENTER" prefHeight="55.0" prefWidth="707.0">
+                            <children>
+                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Lập Lịch Bảo Trì" textAlignment="CENTER" wrappingWidth="706.9394378662109">
+                                    <font>
+                                        <Font size="35.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets bottom="30.0" />
+                                    </HBox.margin>
+                                </Text>
+                            </children>
+                        </HBox>
+
+                        <!-- Các HBox khác giữ nguyên -->
+                        <!-- Chọn thiết bị, hạn bảo trì -->
+                        <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
+                            <children>
+                                <Text text="Chọn Thiết Bị:">
+                           <font>
+                              <Font size="15.0" />
+                           </font></Text>
+                                <ComboBox fx:id="comboBoxDevices" prefHeight="26.0" prefWidth="244.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin></ComboBox>
+                                <Text text="Hạn bảo trì:">
+                           <HBox.margin>
+                              <Insets left="50.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="15.0" />
+                           </font></Text>
+                                <DatePicker fx:id="deadlinePicker" prefHeight="30.0" prefWidth="105.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin></DatePicker>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="15.0" />
+                            </VBox.margin>
+                        </HBox>
+
+                        <!-- Giờ và ngày bảo trì -->
+                        <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
+                            <children>
+                                <Text text="Giờ bảo trì:">
+                           <font>
+                              <Font size="15.0" />
+                           </font></Text>
+                                <TextField fx:id="txtTime" prefHeight="26.0" prefWidth="52.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin></TextField>
+                                <Text text="Ngày bảo trì:">
+                           <HBox.margin>
+                              <Insets left="50.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="15.0" />
+                           </font></Text>
+                                <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="105.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin></DatePicker>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="15.0" />
+                            </VBox.margin>
+                        </HBox>
+
+                        <!-- Tần suất và kỹ thuật viên -->
+                        <HBox alignment="CENTER" prefHeight="43.0" prefWidth="706.0">
+                            <children>
+                                <Text text="Tần suất:">
+                           <font>
+                              <Font size="15.0" />
+                           </font></Text>
+                                <ComboBox fx:id="comboBoxFrequency" prefHeight="26.0" prefWidth="122.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin></ComboBox>
+                                <Text text="Kỹ thuật viên:">
+                           <HBox.margin>
+                              <Insets left="50.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="15.0" />
+                           </font></Text>
+                                <ComboBox fx:id="comboBoxExecutor" prefHeight="26.0" prefWidth="197.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin></ComboBox>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="15.0" />
+                            </VBox.margin>
+                        </HBox>
+
+                        <!-- Nút lập lịch -->
+                        <HBox alignment="CENTER" prefHeight="41.0" prefWidth="700.0">
+                            <children>
+                                <Button fx:id="btnSchedule" onAction="#handleScheduleButton" text="Lập Lịch">
+                           <font>
+                              <Font size="15.0" />
+                           </font></Button>
+                            </children>
+                        </HBox>
+
+                        <!-- Label thông báo -->
+                        <HBox alignment="TOP_CENTER" prefHeight="41.0" prefWidth="706.0">
+                            <children>
+                                <Label fx:id="lblMessage" text="Label" textAlignment="CENTER">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="10.0" />
+                           </HBox.margin></Label>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
+        </Tab>
+
+        <!-- Tab Quản lý lịch -->
+        <Tab fx:id="tabManagement" closable="false" text="Quản lý lịch">
+            <content>
+                <VBox alignment="CENTER">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="62.0" prefWidth="700.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Danh sách lịch bảo trì đã lập">
+                           <font>
+                              <Font size="25.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <TableView fx:id="scheduleTable" prefHeight="361.0" prefWidth="826.0">
+                    <columns>
+                      <TableColumn fx:id="colId" prefWidth="48.799986243247986" text="ID" />
+                      <TableColumn fx:id="colDevice" prefWidth="175.20001983642578" text="Thiết bị" />
+                        <TableColumn fx:id="colScheduledDate" prefWidth="92.79998779296875" text="Ngày bảo trì" />
+                        <TableColumn fx:id="colScheduledTime" minWidth="4.0" prefWidth="48.0" text="Giờ" />
+                        <TableColumn fx:id="colFrequency" prefWidth="83.20001220703125" text="Tần suất" />
+                        <TableColumn fx:id="colExecutor" prefWidth="169.59994506835938" text="Kỹ thuật viên" />
+                        <TableColumn fx:id="colNextDate" prefWidth="104.800048828125" text="Bảo trì tiếp theo" />
+                        <TableColumn fx:id="colCreatedAt" prefWidth="100.80002441406248" text="Ngày tạo" />
+                        <TableColumn fx:id="colAction" prefWidth="135.2000732421875" text="Hành động" />
+                    </columns>
+                  </TableView>
+               </children>
+                </VBox>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>

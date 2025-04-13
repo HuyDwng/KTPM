@@ -1,31 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.LoginController">
-    <children>
-        <VBox alignment="CENTER" spacing="10" prefWidth="300" prefHeight="250">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
+<StackPane fx:controller="com.bttb.controllers.LoginController"
+           xmlns:fx="http://javafx.com/fxml"
+           prefWidth="450" prefHeight="350"
+           style="-fx-background-color: linear-gradient(to bottom right, #e0e0e0, #ffffff);">
 
-            <Label text="Đăng nhập" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+    <VBox spacing="15" alignment="CENTER" maxWidth="320" style="-fx-background-color: white; -fx-padding: 30; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+        
+        <!-- Logo -->
+        <ImageView fitHeight="70" fitWidth="70">
+            <image>
+                <Image url="@../assets/maintenance.png" />
+            </image>
+        </ImageView>
 
-            <TextField fx:id="usernameField" promptText="Tên người dùng" />
-            <PasswordField fx:id="passwordField" promptText="Mật khẩu" />
-            
-            <ComboBox fx:id="roleComboBox" />
+        <!-- Title -->
+        <Label text="BẢO TRÌ THIẾT BỊ" style="-fx-font-size: 20px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;" />
 
-            <Button fx:id="loginButton" text="Đăng nhập" />
-            <Label fx:id="errorLabel" textFill="red" visible="false" />
+        <!-- Username -->
+        <TextField fx:id="txtUsername" promptText="Tên đăng nhập" maxWidth="250"
+                   style="-fx-background-radius: 8; -fx-padding: 8;" />
 
-        </VBox>
-    </children>
-</AnchorPane>
+        <!-- Password -->
+        <PasswordField fx:id="txtPassword" promptText="Mật khẩu" maxWidth="250"
+                       style="-fx-background-radius: 8; -fx-padding: 8;" />
 
+        <!-- Error message -->
+        <Label fx:id="lblMessage" textFill="red" style="-fx-font-size: 12px;" />
+
+        <!-- Login button -->
+        <Button text="ĐĂNG NHẬP" onAction="#handleLogin"
+                style="-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
+                maxWidth="250"/>
+    </VBox>
+</StackPane>
