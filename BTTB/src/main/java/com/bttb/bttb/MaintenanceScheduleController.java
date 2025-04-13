@@ -7,12 +7,16 @@ import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -305,30 +309,43 @@ public class MaintenanceScheduleController implements Initializable {
         int executorId = selectedUser.getId();
         String executorName = selectedUser.toString();
 
-        LocalDateTime scheduleDateTime = LocalDateTime.of(selectedDate, selectedTime);
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
         if (ss.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime, selectedFrequency, executorId, maintenancePeriod)) {
             showSuccess("Lập lịch thành công!");
 
-            // Gửi mail
-            String toEmail = ScheduleServices.getExecutorEmail(executorId);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String content = String.format(
-                    "Thiết bị '%s' đã được lập lịch bảo trì vào lúc %s %s, với tần suất: %s.\n"
-                    + "Người thực hiện: %s.\nHạn bảo trì: %s.",
-                    selectedDevice.getName(),
-                    selectedDate.toString(),
-                    selectedTime.toString(),
-                    selectedFrequency,
-                    executorName,
-                    maintenancePeriod.format(formatter)
-            );
+            // Tính thời gian còn lại đến ngày bảo trì - 24 giờ
+            LocalDateTime maintenanceDateTime = LocalDateTime.of(selectedDate, selectedTime);
+            LocalDateTime emailTime = maintenanceDateTime.minusHours(24);
+            long delay = Duration.between(LocalDateTime.now(), emailTime).toMillis();
 
-            boolean emailSent = EmailUtils.sendEmail(toEmail, "Thông báo lập lịch bảo trì thiết bị", content);
-            if (!emailSent) {
-                showError("Lập lịch thành công nhưng gửi email thất bại!");
+            // Nếu delay > 0 thì mới đặt lịch gửi mail
+            if (delay > 0) {
+                Runnable sendEmailTask = () -> {
+                    String toEmail = ScheduleServices.getExecutorEmail(executorId);
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    String content = String.format(
+                            "Thiết bị '%s' sẽ được bảo trì vào lúc %s %s, với tần suất: %s.\n"
+                            + "Người thực hiện: %s.\nHạn bảo trì: %s.",
+                            selectedDevice.getName(),
+                            selectedDate.toString(),
+                            selectedTime.toString(),
+                            selectedFrequency,
+                            executorName,
+                            maintenancePeriod.format(formatter)
+                    );
+
+                    boolean emailSent = EmailUtils.sendEmail(toEmail, "Nhắc bảo trì thiết bị", content);
+                    if (!emailSent) {
+                        System.err.println("Gửi email nhắc thất bại!");
+                    }
+                };
+
+                scheduler.schedule(sendEmailTask, delay, TimeUnit.MILLISECONDS);
+            } else {
+                System.out.println("Thời gian bảo trì quá gần, không thể đặt email trước 24h.");
             }
-            
+
             //Load lại bảng
             loadScheduleTableData();
         } else {
