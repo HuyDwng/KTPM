@@ -19,20 +19,22 @@ public class MaintenanceSchedule {
     private LocalDate scheduledDate;
     private LocalTime scheduledTime;
     private String frequency;
-    private LocalDate nextMaintenanceDate;
+    private LocalDate maintenancePeriod;
     private LocalDate createdAt;
+    private LocalDate lastMaintenanceDate;
 
     public MaintenanceSchedule(int id, String deviceName, String executorName,
             LocalDate scheduledDate, LocalTime scheduledTime,
-            String frequency, LocalDate nextMaintenanceDate, LocalDate createdAt) {
+            String frequency, LocalDate maintenancePeriod, LocalDate createdAt, LocalDate lastMaintenanceDate) {
         this.id = id;
         this.deviceName = deviceName;
         this.executorName = executorName;
         this.scheduledDate = scheduledDate;
         this.scheduledTime = scheduledTime;
         this.frequency = frequency;
-        this.nextMaintenanceDate = nextMaintenanceDate;
+        this.maintenancePeriod = maintenancePeriod;
         this.createdAt = createdAt;
+        this.lastMaintenanceDate = lastMaintenanceDate;
     }
 
     public void setId(int id) {
@@ -59,12 +61,12 @@ public class MaintenanceSchedule {
         return executorName;
     }
 
-    public void setNextMaintenanceDate(LocalDate nextMaintenanceDate) {
-        this.nextMaintenanceDate = nextMaintenanceDate;
+    public void setMaintenancePeriod(LocalDate maintenancePeriod) {
+        this.maintenancePeriod = maintenancePeriod;
     }
 
-    public LocalDate getNextMaintenanceDate() {
-        return nextMaintenanceDate;
+    public LocalDate getMaintenancePeriod() {
+        return maintenancePeriod;
     }
 
     public void setScheduledDate(LocalDate scheduledDate) {
@@ -97,5 +99,13 @@ public class MaintenanceSchedule {
 
     public String getFrequency() {
         return frequency;
+    }
+
+    public LocalDate getLastMaintenanceDate() {
+        return lastMaintenanceDate;
+    }
+
+    public void setLastMaintenanceDate(LocalDate lastMaintenanceDate) {
+        this.lastMaintenanceDate = lastMaintenanceDate;
     }
 }

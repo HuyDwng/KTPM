@@ -303,7 +303,6 @@ public class RepairHistoryController implements Initializable {
                         stm2.setInt(1, repair.getId());
                         stm2.executeUpdate();
                     }
-
                     conn.commit(); // Xác nhận thay đổi
 
                     tableRepairHistory.getItems().remove(repair);

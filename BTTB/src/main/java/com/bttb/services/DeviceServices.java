@@ -108,6 +108,7 @@ public class DeviceServices {
             e.printStackTrace();
         }
         return false;
+    }
 
     public List<Device> getDevicesForRepair() throws SQLException {
         List<Device> devices = new ArrayList<>();
