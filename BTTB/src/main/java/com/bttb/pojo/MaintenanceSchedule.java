@@ -20,7 +20,30 @@ public class MaintenanceSchedule {
     private LocalTime scheduledTime;
     private String frequency;
     private LocalDate nextMaintenanceDate;
+    private LocalDate completedDate;
     private LocalDate createdAt;
+
+    public MaintenanceSchedule(int id, String deviceName, String executorName,
+            LocalDate scheduledDate, LocalTime scheduledTime,
+            String frequency, LocalDate nextMaintenanceDate, LocalDate createdAt, LocalDate completedDate) {
+        this.id = id;
+        this.deviceName = deviceName;
+        this.executorName = executorName;
+        this.scheduledDate = scheduledDate;
+        this.scheduledTime = scheduledTime;
+        this.frequency = frequency;
+        this.nextMaintenanceDate = nextMaintenanceDate;
+        this.createdAt = createdAt;
+        this.completedDate = completedDate; // Khởi tạo ngày hoàn thành
+    }
+
+    public LocalDate getCompletedDate() {
+        return completedDate;
+    }
+
+    public void setCompletedDate(LocalDate completedDate) {
+        this.completedDate = completedDate;
+    }
 
     public MaintenanceSchedule(int id, String deviceName, String executorName,
             LocalDate scheduledDate, LocalTime scheduledTime,
@@ -97,5 +120,17 @@ public class MaintenanceSchedule {
 
     public String getFrequency() {
         return frequency;
+    }
+
+    public void calculateNextMaintenanceDate() {
+        if (completedDate != null) {
+            // Giả sử frequency là "monthly", bạn có thể thay đổi logic này tùy theo yêu cầu.
+            if ("Hàng tuần".equalsIgnoreCase(frequency)) {
+                this.nextMaintenanceDate = completedDate.plusWeeks(1);
+            } else if ("Hàng tháng".equalsIgnoreCase(frequency)) {
+                this.nextMaintenanceDate = completedDate.plusMonths(1);
+            } 
+            
+        }
     }
 }

@@ -177,6 +177,8 @@
                         <TableColumn fx:id="colNextDate" prefWidth="104.800048828125" text="Bảo trì tiếp theo" />
                         <TableColumn fx:id="colCreatedAt" prefWidth="100.80002441406248" text="Ngày tạo" />
                         <TableColumn fx:id="colAction" prefWidth="135.2000732421875" text="Hành động" />
+                        
+
                     </columns>
                   </TableView>
                </children>

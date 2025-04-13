@@ -2,19 +2,25 @@ package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.EmailUtils;
+import com.bttb.pojo.JdbcUtils;
 import com.bttb.pojo.MaintenanceSchedule;
 import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -23,6 +29,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
@@ -429,20 +436,137 @@ public class MaintenanceScheduleController implements Initializable {
         }
     }
 
+    @FXML
+    private void handleComplete() {
+        try {
+            // Lấy thông tin lịch bảo trì hiện tại từ UI hoặc database
+            int scheduleId = getSelectedScheduleId(); // Lấy ID lịch bảo trì đang được chọn
+            if (scheduleId == -1) {
+                showAlert(AlertType.WARNING, "Chưa chọn lịch bảo trì", "Vui lòng chọn lịch bảo trì cần hoàn thành.");
+                return;
+            }
+
+            // Lưu ngày hoàn thành vào cơ sở dữ liệu
+            LocalDate completedDate = LocalDate.now(); // Ngày hoàn thành là ngày hiện tại
+            boolean isUpdated = updateMaintenanceSchedule(scheduleId, completedDate);
+
+            if (isUpdated) {
+                // Tính toán ngày bảo trì tiếp theo dựa trên ngày hoàn thành
+                LocalDate nextMaintenanceDate = calculateNextMaintenanceDate(completedDate);
+
+                // Cập nhật lại ngày nhắc nhở bảo trì tiếp theo vào database
+                updateNextMaintenanceDate(scheduleId, nextMaintenanceDate);
+
+                // Hiển thị thông báo thành công
+                showAlert(AlertType.INFORMATION, "Hoàn thành bảo trì", "Bảo trì đã được hoàn thành và ngày bảo trì tiếp theo đã được cập nhật.");
+            } else {
+                showAlert(AlertType.ERROR, "Lỗi", "Có lỗi khi cập nhật ngày hoàn thành.");
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            showAlert(AlertType.ERROR, "Lỗi cơ sở dữ liệu", "Có lỗi trong quá trình xử lý.");
+        }
+    }
+
+    // Cập nhật ngày hoàn thành vào cơ sở dữ liệu
+    private boolean updateMaintenanceSchedule(int scheduleId, LocalDate completedDate) throws SQLException {
+        String sql = "UPDATE maintenance_schedule SET completed_date = ? WHERE id = ?";
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(completedDate));
+            stmt.setInt(2, scheduleId);
+            return stmt.executeUpdate() > 0; // Trả về true nếu cập nhật thành công
+        }
+    }
+
+    // Tính toán ngày bảo trì tiếp theo (ví dụ: mỗi tháng hoặc theo chu kỳ khác)
+    private LocalDate calculateNextMaintenanceDate(LocalDate completedDate) {
+        // Ví dụ tính toán ngày bảo trì tiếp theo là sau 1 tháng
+        return completedDate.plusMonths(1);
+    }
+
+    // Cập nhật ngày bảo trì tiếp theo vào cơ sở dữ liệu
+    private void updateNextMaintenanceDate(int scheduleId, LocalDate nextMaintenanceDate) throws SQLException {
+        String sql = "UPDATE maintenance_schedule SET next_maintenance_date = ? WHERE id = ?";
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(nextMaintenanceDate));
+            stmt.setInt(2, scheduleId);
+            stmt.executeUpdate(); // Cập nhật ngày bảo trì tiếp theo
+        }
+    }
+
+    // Hiển thị thông báo Alert
+    private void showAlert(AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    // Lấy ID của lịch bảo trì đang được chọn (Có thể lấy từ UI)
+    private int getSelectedScheduleId() {
+        // Đây là ví dụ, bạn cần lấy ID từ UI (bảng hoặc list)
+        return 1; // Lấy ID mẫu, bạn cần thay bằng cách lấy ID thực tế
+    }
+
+    private void completeMaintenance(MaintenanceSchedule ms) {
+        try {
+            // Lưu ngày hoàn thành vào cơ sở dữ liệu
+            LocalDate completedDate = LocalDate.now(); // Ngày hoàn thành là ngày hiện tại
+            boolean isUpdated = updateMaintenanceSchedule(ms.getId(), completedDate);
+
+            if (isUpdated) {
+                // Tính toán ngày bảo trì tiếp theo dựa trên ngày hoàn thành
+                LocalDate nextMaintenanceDate = calculateNextMaintenanceDate(completedDate);
+
+                // Cập nhật lại ngày bảo trì tiếp theo vào database
+                updateNextMaintenanceDate(ms.getId(), nextMaintenanceDate);
+
+                // Hiển thị thông báo thành công
+                showAlert(AlertType.INFORMATION, "Hoàn thành bảo trì", "Bảo trì đã được hoàn thành và ngày bảo trì tiếp theo đã được cập nhật.");
+            } else {
+                showAlert(AlertType.ERROR, "Lỗi", "Có lỗi khi cập nhật ngày hoàn thành.");
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            showAlert(AlertType.ERROR, "Lỗi cơ sở dữ liệu", "Có lỗi trong quá trình xử lý.");
+        }
+    }
+
     private void addActionButtonsToTable() {
         colAction.setCellFactory(param -> new TableCell<MaintenanceSchedule, Void>() {
             private final Button btnDelete = new Button("Xóa");
-            private final HBox pane = new HBox(10, btnDelete);
+            private final Button btnComplete = new Button("Hoàn thành");
+            private final HBox pane = new HBox(10, btnDelete, btnComplete);
 
             {
-                btnDelete.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
-                pane.setAlignment(Pos.CENTER);
+            btnDelete.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
+            btnComplete.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+            pane.setAlignment(Pos.CENTER);
 
-                btnDelete.setOnAction(evt -> {
-                    MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
-                    deleteSchedule(ms);
-                });
-            }
+            btnDelete.setOnAction(evt -> {
+                MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
+                deleteSchedule(ms);
+            });
+
+            btnComplete.setOnAction(evt -> {
+                MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
+
+                // Gọi service cập nhật completed_date và next_maintenance_date
+                boolean success = ss.completeSchedule(ms.getId(), LocalDate.now(), ms.getFrequency());
+                if (success) {
+                    ms.setCompletedDate(LocalDate.now());
+
+                    // Tính ngày bảo trì tiếp theo dựa vào completedDate
+                    ms.calculateNextMaintenanceDate(); 
+
+                    // Refresh lại bảng hoặc chỉ disable nút
+                    btnComplete.setDisable(true);
+                }
+            });
+        }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -573,4 +697,51 @@ public class MaintenanceScheduleController implements Initializable {
 //            }
 //        });
 //    }
+    public static void showUpcomingMaintenance(List<MaintenanceSchedule> schedules, int daysAhead) {
+        List<MaintenanceSchedule> upcoming = getUpcomingSchedules(schedules, daysAhead);
+
+        if (upcoming.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Thông báo bảo trì");
+            alert.setHeaderText("Không có lịch bảo trì sắp tới");
+            alert.setContentText("Chưa có thiết bị nào cần bảo trì trong " + daysAhead + " ngày tới.");
+            alert.show();
+            return;
+        }
+
+        StringBuilder content = new StringBuilder();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        for (MaintenanceSchedule s : upcoming) {
+            content.append("🔧 Thiết bị: ").append(s.getDeviceName())
+                    .append("\n👨‍🔧 Người thực hiện: ").append(s.getExecutorName())
+                    .append("\n📅 Ngày bảo trì: ").append(s.getNextMaintenanceDate().format(dateFormatter))
+                    .append(" lúc ").append(s.getScheduledTime())
+                    .append("\n-------------------------------------\n");
+        }
+
+        TextArea textArea = new TextArea(content.toString());
+        textArea.setWrapText(true);
+        textArea.setEditable(false);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Thông báo bảo trì định kỳ");
+        alert.setHeaderText("Danh sách thiết bị sắp được bảo trì");
+        alert.getDialogPane().setContent(textArea);
+        alert.show();
+    }
+
+    public static List<MaintenanceSchedule> getUpcomingSchedules(List<MaintenanceSchedule> schedules, int daysAhead) {
+        LocalDate today = LocalDate.now();
+        LocalDate targetDate = today.plusDays(daysAhead);
+
+        return schedules.stream()
+                .filter(s -> s.getScheduledDate() != null
+                && !s.getScheduledDate().isBefore(today)
+                && !s.getScheduledDate().isAfter(targetDate))
+                .collect(Collectors.toList());
+    }
+
 }
