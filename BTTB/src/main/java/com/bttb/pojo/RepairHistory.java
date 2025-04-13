@@ -8,7 +8,9 @@ public class RepairHistory {
 
     private int id;
     private int deviceId;
-    private String technician;
+    private String deviceName;
+    private int technicianId;
+    private String technicianName;
     private LocalDateTime repairDate;
     private LocalDateTime completionDate;
     private String status;
@@ -16,17 +18,28 @@ public class RepairHistory {
     private List<String> repairIssue; // Danh sách các lỗi
     private double cost;
 
-    
-    public RepairHistory(int id, int deviceId, String technician, List<String> repairIssue, LocalDateTime repairDate, LocalDateTime completionDate, String status, double cost) {
+    public RepairHistory(int id, int deviceId, int technicianId, List<String> repairIssue, LocalDateTime repairDate, LocalDateTime completionDate, String status, double cost) {
         this.id = id;
         this.deviceId = deviceId;
-        this.technician = technician;
+        this.technicianId = technicianId;
         this.repairIssue = repairIssue;
         this.repairDate = repairDate;
         this.completionDate = completionDate;
         this.status = status;
         this.cost = cost;
-        
+    }
+
+    public RepairHistory(int id, int deviceId, String deviceName, int technicianId, String technicianName, List<String> repairIssue, LocalDateTime repairDate, LocalDateTime completionDate, String status, double cost) {
+        this.id = id;
+        this.deviceId = deviceId;
+        this.deviceName = deviceName;
+        this.technicianId = technicianId;
+        this.technicianName = technicianName;
+        this.repairIssue = repairIssue;
+        this.repairDate = repairDate;
+        this.completionDate = completionDate;
+        this.status = status;
+        this.cost = cost;
     }
 
     // Getter và Setter cho các trường
@@ -46,12 +59,12 @@ public class RepairHistory {
         this.deviceId = deviceId;
     }
 
-    public String getTechnician() {
-        return technician;
+    public String getTechnicianName() {
+        return technicianName;
     }
 
-    public void setTechnician(String technician) {
-        this.technician = technician;
+    public void setTechnicianName(String technicianName) {
+        this.technicianName = technicianName;
     }
 
     public LocalDateTime getRepairDate() {
@@ -100,5 +113,33 @@ public class RepairHistory {
 
     public void setDeviceTypeId(int deviceTypeId) {
         this.deviceTypeId = deviceTypeId;
+    }
+
+    /**
+     * @return the deviceName
+     */
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    /**
+     * @param deviceName the deviceName to set
+     */
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    /**
+     * @return the technicianId
+     */
+    public int getTechnicianId() {
+        return technicianId;
+    }
+
+    /**
+     * @param technicianId the technicianId to set
+     */
+    public void setTechnicianId(int technicianId) {
+        this.technicianId = technicianId;
     }
 }
