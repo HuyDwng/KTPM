@@ -9,6 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -60,6 +63,22 @@ public class DeviceServices {
         }
     }
 
+    public List<Device> getDevicesForRepair() throws SQLException {
+        List<Device> devices = new ArrayList<>();
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "SELECT * FROM device";
+            PreparedStatement stm = conn.prepareCall(sql);
+
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"), rs.getInt("device_type_id"));
+                devices.add(d);
+            }
+
+            return devices;
+        }
+    }
+
 //    public List<Device> getAllDevices() {
 //        List<Device> devices = new ArrayList<>();
 //        String sql = "SELECT id, name, status FROM device";
@@ -75,18 +94,35 @@ public class DeviceServices {
 //        }
 //        return devices;
 //    }
-    public List<String> getBrokenDevices() throws SQLException {
-        List<String> brokenDevices = new ArrayList<>();
-        try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT DISTINCT id FROM device WHERE status = 'Hỏng hóc'";
-            PreparedStatement stm = conn.prepareStatement(sql);
-            ResultSet rs = stm.executeQuery();
+    public List<Device> getBrokenDevices() throws SQLException {
+        List<Device> devices = new ArrayList<>();
 
-            while (rs.next()) {
-                brokenDevices.add(rs.getString("id"));
-            }
+        Connection conn = JdbcUtils.getConn();
+        String sql = "SELECT id, name, status FROM device WHERE status = 'Hỏng hóc'";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"));
+            devices.add(d);
         }
-        return brokenDevices;
+
+        return devices;
+    }
+
+    public Device getDeviceById(int id) throws SQLException {
+        Connection conn = JdbcUtils.getConn();
+        String sql = "SELECT * FROM device WHERE id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, id); // ⚠️ thêm dòng này để gán giá trị id
+
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            return new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"));
+        }
+
+        return null; // nếu không tìm thấy
     }
 
     public boolean updateDeviceStatus(int deviceId, String newStatus) {
@@ -117,4 +153,5 @@ public class DeviceServices {
             return false;
         }
     }
+
 }
