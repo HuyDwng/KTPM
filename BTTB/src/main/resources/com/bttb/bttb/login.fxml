@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.LoginController">
+<AnchorPane style="-fx-background-color: linear-gradient(to bottom, #e0eafc, #cfdef3);" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.bttb.bttb.LoginController">
     <children>
-        <VBox alignment="CENTER" spacing="10" prefWidth="300" prefHeight="250">
+        <VBox alignment="CENTER" prefHeight="400.0" prefWidth="500.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 30;">
+            <effect>
+                <DropShadow color="rgba(0,0,0,0.2)" offsetX="0" offsetY="5" radius="10" />
+            </effect>
+
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets bottom="20" left="20" right="20" top="20" />
             </padding>
 
-            <Label text="Đăng nhập" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Đăng nhập hệ thống" />
 
-            <TextField fx:id="usernameField" promptText="Tên người dùng" />
-            <PasswordField fx:id="passwordField" promptText="Mật khẩu" />
+            <TextField fx:id="usernameField" promptText="Tên người dùng" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;" />
+            <PasswordField fx:id="passwordField" promptText="Mật khẩu" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;" />
             
-            <ComboBox fx:id="roleComboBox" />
+            <ComboBox fx:id="roleComboBox" promptText="Chọn vai trò" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;" />
 
-            <Button fx:id="loginButton" text="Đăng nhập" />
-            <Label fx:id="errorLabel" textFill="red" visible="false" />
+            <Button fx:id="loginButton" onMouseEntered="#hoverLoginButton" onMouseExited="#unhoverLoginButton" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 10 20;" text="Đăng nhập" />
 
+            <Label fx:id="errorLabel" style="-fx-font-style: italic;" textFill="red" visible="false" />
         </VBox>
     </children>
 </AnchorPane>
-
