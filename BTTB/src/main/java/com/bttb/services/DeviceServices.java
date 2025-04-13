@@ -98,7 +98,7 @@ public class DeviceServices {
 
             stmt.setString(1, device.getName());
             stmt.setString(2, device.getStatus());
-            stmt.setInt(3, device.getDevice_type_id());
+            stmt.setInt(3, device.getDeviceTypeId());
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
                 controller.loadDeviceData();
@@ -110,7 +110,7 @@ public class DeviceServices {
         return false;
     }
 
-    public List<Device> getDevicesForRepair() throws SQLException {
+    public List<Device> getDevicesForRepair() throws SQLException{
         List<Device> devices = new ArrayList<>();
         try (Connection conn = JdbcUtils.getConn()) {
             String sql = "SELECT * FROM device";
@@ -118,7 +118,7 @@ public class DeviceServices {
 
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"), rs.getInt("device_type_id"));
+                Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"), rs.getInt("deviceTypeId"));
                 devices.add(d);
             }
 
