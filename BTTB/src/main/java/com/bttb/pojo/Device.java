@@ -8,7 +8,7 @@ public class Device {
     private int id;
     private String name;
     private String status;
-    private int device_type_id;
+    private int deviceTypeId;
     private String deviceTypeName; 
 
     public Device(int id, String name, String status, String deviceTypeName) {
@@ -26,27 +26,20 @@ public class Device {
     public void setDeviceTypeName(String deviceTypeName) {
         this.deviceTypeName = deviceTypeName;
     }
-    public Device(int id, String name, String status, int device_type_id) {
-        this.id = id;
+
+    public Device(String name, String status, int deviceTypeId) {
         this.name = name;
         this.status = status;
-        this.device_type_id = device_type_id;
+        this.deviceTypeId = deviceTypeId;
     }
     
     
-    public int getDevice_type_id() {
-        return device_type_id;
-    }
+    
+    
 
-    public Device(String name, String status, int device_type_id) {
-        this.name = name;
-        this.status = status;
-        this.device_type_id = device_type_id;
-    }
+    
 
-    public void setDevice_type_id(int device_type_id) {
-        this.device_type_id = device_type_id;
-    }
+    
   
     public Device() {
     }
