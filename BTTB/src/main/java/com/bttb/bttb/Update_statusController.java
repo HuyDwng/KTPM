@@ -11,6 +11,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.collections.FXCollections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Update_statusController {
 
@@ -35,8 +37,6 @@ public class Update_statusController {
         this.deviceManagementController = controller;
     }
 
-    
-
     private void loadDeviceList() throws SQLException {
         if (deviceService != null) {
             List<Device> devices = deviceService.getDevices();
@@ -49,12 +49,7 @@ public class Update_statusController {
         Device selectedDevice = cbDevice.getValue();
         String selectedStatus = cbStatus.getValue();
 
-        System.out.print(selectedDevice + "||");
-        System.out.print(selectedDevice.getStatus() + "||");
-        System.out.print(selectedDevice.getName() + "||");
-        System.out.print(selectedDevice.getId() + "||");
-        System.out.print("Đã thanh lý".equals(selectedDevice.getStatus()) + "||");
-        System.out.print("Đã thanh lý");
+        
         if (selectedDevice == null || selectedStatus == null) {
             showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Vui lòng chọn thiết bị và trạng thái!");
             return;
@@ -78,7 +73,11 @@ public class Update_statusController {
             if (response == ButtonType.OK && deviceService.updateDeviceStatus(selectedDevice.getId(), selectedStatus)) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Cập nhật trạng thái thành công!");
                 if (deviceManagementController != null) {
-                    deviceManagementController.loadDeviceData();
+                    try {
+                        deviceManagementController.loadDeviceData();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Update_statusController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
                 closeWindow();
             } else {
@@ -98,7 +97,7 @@ public class Update_statusController {
     private void closeWindow() {
         ((Stage) btnConfirm.getScene().getWindow()).close();
     }
-    
+
     @FXML
     public void initialize() {
         cbStatus.setItems(FXCollections.observableArrayList("Đang hoạt động", "Đang sửa", "Hỏng hóc", "Đã thanh lý"));

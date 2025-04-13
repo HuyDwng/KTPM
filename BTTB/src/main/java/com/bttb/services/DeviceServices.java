@@ -15,7 +15,7 @@ import javafx.collections.ObservableList;
 
 /**
  *
- * @author LEGION
+ * @author nhanh
  */
 public class DeviceServices {
 
@@ -27,24 +27,6 @@ public class DeviceServices {
     }
 
     public DeviceServices() {
-    }
-
-    public boolean addDevice(Device device) {
-        String sql = "INSERT INTO device (name, status) VALUES (?, ?)";
-
-        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, device.getName());
-            stmt.setString(2, device.getStatus());
-
-            int rowsInserted = stmt.executeUpdate();
-            if (rowsInserted > 0) {
-                controller.loadDeviceData();  // Gọi phương thức load lại bảng
-                return true;
-            }
-        } catch (SQLException e) {
-        }
-        return false;
     }
 
     public List<Device> getDevices() throws SQLException {
@@ -62,6 +44,70 @@ public class DeviceServices {
             return devices;
         }
     }
+
+    public List<Device> getAllDevicesForSearch() {
+        List<Device> devices = new ArrayList<>();
+        String query = "SELECT d.id, d.name, d.status, dt.name as deviceTypeName "
+                + "FROM device d JOIN device_type dt ON d.device_type_id = dt.id";
+
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String status = rs.getString("status");
+                String deviceTypeName = rs.getString("deviceTypeName");
+
+                devices.add(new Device(id, name, status, deviceTypeName));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return devices;
+    }
+
+    public List<Device> getAllDevices() throws SQLException {
+        List<Device> list = new ArrayList<>();
+        Connection conn = JdbcUtils.getConn();
+
+        String sql = "SELECT d.id, d.name, d.status, dt.name AS device_type_name "
+                + "FROM device d "
+                + "JOIN device_type dt ON d.device_type_id = dt.id";
+
+        PreparedStatement stm = conn.prepareStatement(sql);
+        ResultSet rs = stm.executeQuery();
+
+        while (rs.next()) {
+            Device d = new Device();
+            d.setId(rs.getInt("id"));
+            d.setName(rs.getString("name"));
+            d.setStatus(rs.getString("status"));
+            d.setDeviceTypeName(rs.getString("device_type_name"));
+
+            list.add(d);
+        }
+
+        return list;
+    }
+
+    public boolean addDevice(Device device) {
+        String sql = "INSERT INTO device(name, status, device_type_id) VALUES (?, ?, ?)";
+
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, device.getName());
+            stmt.setString(2, device.getStatus());
+            stmt.setInt(3, device.getDevice_type_id());
+            int rowsInserted = stmt.executeUpdate();
+            if (rowsInserted > 0) {
+                controller.loadDeviceData();
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
 
     public List<Device> getDevicesForRepair() throws SQLException {
         List<Device> devices = new ArrayList<>();
@@ -153,5 +199,4 @@ public class DeviceServices {
             return false;
         }
     }
-
 }

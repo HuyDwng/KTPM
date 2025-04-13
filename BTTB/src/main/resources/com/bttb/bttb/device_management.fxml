@@ -27,7 +27,7 @@
                 <TableColumn text="Mã thiết bị" fx:id="colDeviceId"/>
                 <TableColumn text="Tên thiết bị" fx:id="colDeviceName"/>
                 <TableColumn text="Trạng thái" fx:id="colStatus"/>
-                
+                <TableColumn text="Loại thiết bị" fx:id="colType"/>
             </columns>
         </TableView>
     </center>

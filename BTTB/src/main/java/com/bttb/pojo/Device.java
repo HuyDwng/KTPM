@@ -8,7 +8,46 @@ public class Device {
     private int id;
     private String name;
     private String status;
-    private int deviceTypeId;
+    private int device_type_id;
+    private String deviceTypeName; 
+
+    public Device(int id, String name, String status, String deviceTypeName) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.deviceTypeName = deviceTypeName;
+    }
+
+    
+    public String getDeviceTypeName() {
+        return deviceTypeName;
+    }
+
+    public void setDeviceTypeName(String deviceTypeName) {
+        this.deviceTypeName = deviceTypeName;
+    }
+    public Device(int id, String name, String status, int device_type_id) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.device_type_id = device_type_id;
+    }
+    
+    
+    public int getDevice_type_id() {
+        return device_type_id;
+    }
+
+    public Device(String name, String status, int device_type_id) {
+        this.name = name;
+        this.status = status;
+        this.device_type_id = device_type_id;
+    }
+
+    public void setDevice_type_id(int device_type_id) {
+        this.device_type_id = device_type_id;
+    }
+  
     public Device() {
     }
 
