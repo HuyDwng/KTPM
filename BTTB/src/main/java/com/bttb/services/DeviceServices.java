@@ -109,6 +109,7 @@ public class DeviceServices {
         }
         return false;
     }
+
     public List<Device> getDevicesForRepair() throws SQLException{
         List<Device> devices = new ArrayList<>();
         try (Connection conn = JdbcUtils.getConn()) {
