@@ -56,5 +56,5 @@ public class RepairIssueServices {
         }
 
         return list;
-    }
+    }   
 }

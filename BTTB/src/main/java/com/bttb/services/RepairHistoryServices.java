@@ -1,5 +1,6 @@
 package com.bttb.services;
 
+import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
 import com.bttb.pojo.RepairHistory;
 import com.bttb.pojo.RepairIssue;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class RepairHistoryServices {
+
+    private final DeviceServices deviceServices = new DeviceServices();
 
     public List<RepairHistory> getRepairHistories() throws SQLException {
         List<RepairHistory> histories = new ArrayList<>();
@@ -43,7 +46,7 @@ public class RepairHistoryServices {
                     rh = new RepairHistory(
                             historyId,
                             rs.getInt("device_id"),
-                            rs.getString("technician_name"),
+                            rs.getInt("technician_id"),
                             new ArrayList<>(),
                             rs.getTimestamp("repair_date") != null ? rs.getTimestamp("repair_date").toLocalDateTime() : null,
                             rs.getTimestamp("completion_date") != null ? rs.getTimestamp("completion_date").toLocalDateTime() : null,
@@ -53,17 +56,20 @@ public class RepairHistoryServices {
                     historyMap.put(historyId, rh);
                     histories.add(rh);
                 }
+                rh.setTechnicianName(rs.getString("technician_name"));
 
                 // Thêm lỗi vào danh sách repairIssues nếu có
                 String repairIssueName = rs.getString("repair_issue_name");
                 Double repairIssuePrice = rs.getDouble("repair_issue_price");
-
                 if (repairIssueName != null) {
                     rh.getRepairIssue().add(repairIssueName);
                 }
+                Device device = deviceServices.getDeviceById(rs.getInt("device_id"));
+                if (device != null) {
+                    rh.setDeviceName(device.getName());
+                }
 
                 // Cộng dồn giá trị repair_issue_price vào cost
-                
             }
         }
         return histories;
@@ -78,7 +84,7 @@ public class RepairHistoryServices {
 
             // Thêm repair_history
             PreparedStatement stmRepair = conn.prepareStatement(insertRepairSql, Statement.RETURN_GENERATED_KEYS);
-            stmRepair.setString(1, repairHistory.getTechnician());
+            stmRepair.setInt(1, repairHistory.getTechnicianId());
             stmRepair.setInt(2, repairHistory.getDeviceId());
             stmRepair.setObject(3, repairHistory.getRepairDate());
             stmRepair.setString(4, repairHistory.getStatus());
