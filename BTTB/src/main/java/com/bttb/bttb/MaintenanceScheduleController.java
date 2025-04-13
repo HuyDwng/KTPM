@@ -2,12 +2,14 @@ package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.EmailUtils;
+import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,9 +28,11 @@ public class MaintenanceScheduleController implements Initializable {
     @FXML
     private ComboBox<String> comboBoxFrequency;
     @FXML
-    private ComboBox<String> comboBoxExecutor;
+    private ComboBox<User> comboBoxExecutor;
     @FXML
     private DatePicker datePicker;
+    @FXML
+    private DatePicker deadlinePicker;
     @FXML
     private TextField txtTime;
     @FXML
@@ -41,14 +45,14 @@ public class MaintenanceScheduleController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         lblMessage.setVisible(false);
         setupDatePicker();
+        setupDeadlinePicker();
         setupTimeField();
         loadExecutors();
 
         comboBoxFrequency.setItems(FXCollections.observableArrayList(
-                "Hàng tuần", "Hàng tháng", "Hàng năm"
+                "Hàng tuần", "Hàng tháng"
         ));
         comboBoxFrequency.getSelectionModel().selectFirst();
 
@@ -140,6 +144,26 @@ public class MaintenanceScheduleController implements Initializable {
     }
 
     private void setupDatePicker() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        datePicker.setConverter(new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate date) {
+                return date != null ? formatter.format(date) : "";
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                try {
+                    return string != null && !string.isEmpty() ? LocalDate.parse(string, formatter) : null;
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        });
+
+        datePicker.setPromptText("dd/MM/yyyy");
+
         datePicker.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate item, boolean empty) {
@@ -152,6 +176,55 @@ public class MaintenanceScheduleController implements Initializable {
         });
 
         datePicker.setValue(LocalDate.now());
+    }
+
+    private void setupDeadlinePicker() {
+        // Format hiển thị: dd/MM/yyyy
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        deadlinePicker.setConverter(new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate date) {
+                return date != null ? formatter.format(date) : "";
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                try {
+                    return string != null && !string.isEmpty() ? LocalDate.parse(string, formatter) : null;
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        });
+
+        deadlinePicker.setPromptText("dd/MM/yyyy");
+
+        // Giới hạn không cho chọn ngày trước ngày bắt đầu
+        deadlinePicker.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                LocalDate startDate = datePicker.getValue();
+                if (item != null && startDate != null && item.isBefore(startDate)) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #EEEEEE;");
+                }
+            }
+        });
+
+        // Đặt ngày mặc định là +3 tháng từ ngày bắt đầu
+        if (datePicker.getValue() != null) {
+            deadlinePicker.setValue(datePicker.getValue().plusMonths(3));
+        }
+
+        // Tự cập nhật khi ngày bắt đầu thay đổi
+        datePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
+            if (newDate != null) {
+                deadlinePicker.setValue(newDate.plusMonths(3));
+                setupDeadlinePicker(); // Gọi lại để update DayCellFactory
+            }
+        });
     }
 
     private void setupTimeField() {
@@ -182,7 +255,7 @@ public class MaintenanceScheduleController implements Initializable {
             }
         });
 
-        txtTime.setOnAction(event -> formatTimeInput()); // Khi nhấn Enter
+        txtTime.setOnAction(event -> formatTimeInput());
     }
 
     private void formatTimeInput() {
@@ -203,7 +276,7 @@ public class MaintenanceScheduleController implements Initializable {
     }
 
     public void loadExecutors() {
-        ObservableList<String> executors = ScheduleServices.loadExecutors();
+        ObservableList<User> executors = ss.loadExecutors();
         comboBoxExecutor.setItems(executors);
     }
 
@@ -219,55 +292,69 @@ public class MaintenanceScheduleController implements Initializable {
             return;
         }
 
-//        if (scheduleService.addMaintenanceSchedule(...)) {
-//            showSuccess("Lập lịch thành công!");
-//
-//            // Gửi email
-//            String executorEmail = ScheduleServices.getEmailByExecutorName(selectedExecutor);
-//            if (executorEmail != null) {
-//                EmailUtils.sendEmail(executorEmail,
-//                        "Thông báo lịch bảo trì",
-//                        String.format("Bạn được phân công bảo trì thiết bị '%s' vào lúc %s %s.",
-//                                selectedDevice.getName(),
-//                                selectedDate.toString(),
-//                                selectedTime.toString())
-//                );
-//            }
-//
-//        } else {
-//            showError("Lưu lịch bảo trì thất bại!");
-//        }
+        LocalDate selectedDate = datePicker.getValue();
+        LocalDate nextMaintenanceDate = deadlinePicker.getValue();
+        LocalTime selectedTime = LocalTime.parse(txtTime.getText());
+        String selectedFrequency = comboBoxFrequency.getSelectionModel().getSelectedItem();
+        User selectedUser = (User) comboBoxExecutor.getValue();
+        int executorId = selectedUser.getId();
+        String executorName = selectedUser.toString();
 
         try {
-            LocalDate selectedDate = datePicker.getValue();
-            LocalTime selectedTime = LocalTime.parse(txtTime.getText());
-            String selectedFrequency = comboBoxFrequency.getSelectionModel().getSelectedItem();
-            String selectedExecutor = comboBoxExecutor.getSelectionModel().getSelectedItem();
-
             if (selectedDate == null || selectedTime == null) {
                 showError("Vui lòng nhập ngày và giờ hợp lệ!");
                 return;
             }
 
             LocalDateTime scheduleDateTime = LocalDateTime.of(selectedDate, selectedTime);
-          
+
             if (scheduleDateTime.isBefore(LocalDateTime.now())) {
                 showError("Thời gian lập lịch phải ở tương lai!");
                 return;
             }
 
-            ScheduleServices scheduleService = new ScheduleServices();
+            if (deadlinePicker.getValue() == null) {
+                showError("Vui lòng chọn hạn bảo trì!");
+                return;
+            }
+            if (deadlinePicker.getValue().isBefore(datePicker.getValue())) {
+                showError("Hạn bảo trì phải sau ngày lập lịch!");
+                return;
+            }
 
-            if (scheduleService.isScheduleDuplicate(selectedDevice.getId(), scheduleDateTime)) {
+            if (ss.isScheduleDuplicate(selectedDevice.getId(), scheduleDateTime)) {
                 showError("Lịch bảo trì đã tồn tại vào thời gian này!");
                 return;
             }
 
-            if (scheduleService.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime, selectedFrequency, selectedExecutor)) {
+            if (ss.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime, selectedFrequency, executorId, nextMaintenanceDate)) {
                 showSuccess("Lập lịch thành công!");
+
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                
+                String toEmail = ScheduleServices.getExecutorEmail(executorId);
+
+                String subject = "Thông báo lập lịch bảo trì thiết bị";
+                String content = String.format(
+                        "Thiết bị '%s' đã được lập lịch bảo trì vào lúc %s %s, với tần suất: %s.\n"
+                        + "Người thực hiện: %s.\nHạn bảo trì tiếp theo: %s.",
+                        selectedDevice.getName(),
+                        selectedDate.toString(),
+                        selectedTime.toString(),
+                        selectedFrequency,
+                        executorName,
+                        nextMaintenanceDate.format(dateFormatter)
+                );
+
+                boolean emailSent = EmailUtils.sendEmail(toEmail, subject, content);
+                if (!emailSent) {
+                    showError("Lập lịch thành công nhưng gửi email thất bại!");
+                }
+
             } else {
                 showError("Lưu lịch bảo trì thất bại!");
             }
+
         } catch (SQLException e) {
             showError("Lỗi SQL: " + e.getMessage());
         } catch (Exception e) {
