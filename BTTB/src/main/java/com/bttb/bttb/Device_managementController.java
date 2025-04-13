@@ -6,7 +6,7 @@ package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
-import com.bttb.service.DeviceService;
+import com.bttb.services.DeviceServices;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -14,6 +14,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,6 +27,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -52,6 +55,8 @@ public class Device_managementController implements Initializable {
     @FXML
     private TableColumn<Device, String> colStatus;
     @FXML
+    private TableColumn<Device, String> colType;
+    @FXML
     private TextField txtName;
     @FXML
     private TextField txtDescription;
@@ -60,7 +65,7 @@ public class Device_managementController implements Initializable {
 
     private ObservableList<Device> deviceList = FXCollections.observableArrayList();
 
-    private DeviceService deviceService = new DeviceService();
+    private DeviceServices deviceService = new DeviceServices();
 
     public void openAddDeviceWindow() {
         try {
@@ -82,10 +87,9 @@ public class Device_managementController implements Initializable {
 
     public void addDevice() {
         String name = txtName.getText();
-        String description = txtDescription.getText();
         String status = txtStatus.getText();
 
-        if (name.isEmpty() || description.isEmpty() || status.isEmpty()) {
+        if (name.isEmpty() || status.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng nhập đầy đủ thông tin!");
             return;
         }
@@ -113,48 +117,54 @@ public class Device_managementController implements Initializable {
         colDeviceId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colDeviceName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-
+        colType.setCellValueFactory(new PropertyValueFactory<>("deviceTypeName"));
     }
 
-    public void loadDeviceData() {
+//    public void loadDeviceData() {
+//        deviceList.clear();
+//
+//        String query = "SELECT d.id, d.name, d.status, dt.name AS device_type_name " +
+//               "FROM device d JOIN device_type dt ON d.device_type_id = dt.id";
+//
+//        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+//
+//            while (rs.next()) {
+//                int id = rs.getInt("id");
+//                String name = rs.getString("name");
+//                String status = rs.getString("status");
+//                int type = rs.getInt("device_type_id");
+//
+//                deviceList.add(new Device(id, name, status, type));
+//            }
+//
+//            deviceTable.setItems(deviceList);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+    public void loadDeviceData() throws SQLException {
         deviceList.clear();
-
-        String query = "SELECT id, name, status FROM device";
-
-        try (Connection conn = JdbcUtils.getConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String status = rs.getString("status");
-
-                deviceList.add(new Device(id, name, status));
-            }
-
-            deviceTable.setItems(deviceList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        deviceList.addAll(deviceService.getAllDevices());
+        deviceTable.setItems(deviceList);
     }
 
-    @FXML
-    public void openAddDeviceForm() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("add_device.fxml"));
-            Parent root = loader.load();
-
-            // Lấy controller của Add_deviceController
-            Add_deviceController addDeviceController = loader.getController();
-            addDeviceController.setDeviceManagementController(this); // Truyền tham chiếu
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+//    @FXML
+//    public void openAddDeviceForm() {
+//        try {
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource("add_device.fxml"));
+//            Parent root = loader.load();
+//
+//            // Lấy controller của Add_deviceController
+//            Add_deviceController addDeviceController = loader.getController();
+//            addDeviceController.setDeviceManagementController(this); // Truyền tham chiếu
+//
+//            Stage stage = new Stage();
+//            stage.setScene(new Scene(root));
+//            stage.show();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
     @FXML
     private void openUpdateStatusForm() {
         try {
@@ -162,7 +172,7 @@ public class Device_managementController implements Initializable {
             Parent root = loader.load();
 
             Update_statusController controller = loader.getController();
-            controller.setDeviceService(new DeviceService());
+            controller.setDeviceService(new DeviceServices());
             controller.setDeviceManagementController(this);
 
             Stage stage = new Stage();
@@ -194,7 +204,11 @@ public class Device_managementController implements Initializable {
                 boolean success = deviceService.deleteDevice(selectedDevice.getId());
                 if (success) {
                     showAlert(Alert.AlertType.INFORMATION, "Thành công", "Xóa thiết bị thành công!");
-                    loadDeviceData(); // Tải lại dữ liệu thiết bị
+                    try {
+                        loadDeviceData(); // Tải lại dữ liệu thiết bị
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Device_managementController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } else {
                     showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể xóa thiết bị!");
                 }
@@ -204,7 +218,6 @@ public class Device_managementController implements Initializable {
 
     @FXML
     private TextField searchField;  // Trường tìm kiếm
-    
 
     private ObservableList<Device> allDeviceList = FXCollections.observableArrayList();
     private ObservableList<Device> filteredDeviceList = FXCollections.observableArrayList();
@@ -218,7 +231,6 @@ public class Device_managementController implements Initializable {
         // Lọc thiết bị dựa trên tên và trạng thái
         filterDevices(searchText, selectedStatus);
     }
-
 
 // Phương thức lọc thiết bị
     private void filterDevices(String searchText, String selectedStatus) {
@@ -236,27 +248,34 @@ public class Device_managementController implements Initializable {
         deviceTable.setItems(filteredDeviceList);  // Cập nhật bảng với danh sách đã lọc
     }
 
+//    @FXML
+//    private void loadDeviceDataSearch() {
+//        allDeviceList.clear();
+//
+//        String query = "SELECT * FROM device";
+//
+//        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+//
+//            while (rs.next()) {
+//                int id = rs.getInt("id");
+//                String name = rs.getString("name");
+//                String status = rs.getString("status");
+//                int type = rs.getInt("device_type_id");
+//
+//                allDeviceList.add(new Device(id, name, status, type));
+//            }
+//
+//            filterDevices(searchField.getText().toLowerCase(), statusFilter.getValue());
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
     @FXML
     private void loadDeviceDataSearch() {
         allDeviceList.clear();
-
-        String query = "SELECT id, name, status FROM device";
-
-        try (Connection conn = JdbcUtils.getConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                String status = rs.getString("status");
-
-                allDeviceList.add(new Device(id, name, status));
-            }
-
-            filterDevices(searchField.getText().toLowerCase(), statusFilter.getValue());
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        allDeviceList.addAll(deviceService.getAllDevicesForSearch());
+        filterDevices(searchField.getText().toLowerCase(), statusFilter.getValue());
     }
 
     @Override
@@ -268,9 +287,22 @@ public class Device_managementController implements Initializable {
 
         statusFilter.setValue("Tất cả");
 
+        deviceTable.setRowFactory(tv -> {
+            TableRow<Device> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    openUpdateStatusForm();
+                }
+            });
+            return row;
+        });
+
         setupTable();
         loadDeviceDataSearch();
-        loadDeviceData();
+        try {
+            loadDeviceData();
+        } catch (SQLException ex) {
+            Logger.getLogger(Device_managementController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-
 }
