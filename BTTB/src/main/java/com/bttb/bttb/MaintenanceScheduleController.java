@@ -572,7 +572,7 @@ public class MaintenanceScheduleController implements Initializable {
         for (MaintenanceSchedule s : upcoming) {
             content.append("🔧 Thiết bị: ").append(s.getDeviceName())
                     .append("\n👨‍🔧 Người thực hiện: ").append(s.getExecutorName())
-                    .append("\n📅 Ngày bảo trì: ").append(s.getNextMaintenanceDate().format(dateFormatter))
+                    .append("\n📅 Ngày bảo trì: ").append(s.getLastMaintenanceDate())
                     .append(" lúc ").append(s.getScheduledTime())
                     .append("\n-------------------------------------\n");
         }

@@ -167,7 +167,8 @@ public class ScheduleServices {
         } catch (SQLException e) {
             System.err.println("Lỗi cập nhật completed_date: " + e.getMessage());
             return false;
-
+        }
+    }
     public boolean markAsCompleted(int scheduleId, LocalDate completedDate) throws SQLException {
         String sql = "UPDATE maintenance_schedule SET last_maintenance_date = ? WHERE id = ?";
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(sql)) {
