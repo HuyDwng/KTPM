@@ -20,8 +20,8 @@ public class MaintenanceSchedule {
     private LocalTime scheduledTime;
     private String frequency;
     private LocalDate maintenancePeriod;
-    private LocalDate createdAt;
     private LocalDate lastMaintenanceDate;
+    private LocalDate createdAt;
 
     public MaintenanceSchedule(int id, String deviceName, String executorName,
             LocalDate scheduledDate, LocalTime scheduledTime,
@@ -101,15 +101,15 @@ public class MaintenanceSchedule {
         return frequency;
     }
 
-    public void calculateNextMaintenanceDate() {
-        if (completedDate != null) {
-            if ("Hàng tuần".equalsIgnoreCase(frequency)) {
-                this.nextMaintenanceDate = completedDate.plusWeeks(1);
-            } else if ("Hàng tháng".equalsIgnoreCase(frequency)) {
-                this.nextMaintenanceDate = completedDate.plusMonths(1);
-            } 
-            
-        }
+//    public void calculateNextMaintenanceDate() {
+//        if (lastMaintenanceDate != null) {
+//            if ("Hàng tuần".equalsIgnoreCase(frequency)) {
+//                this.nextMaintenanceDate = lastMaintenanceDate.plusWeeks(1);
+//            } else if ("Hàng tháng".equalsIgnoreCase(frequency)) {
+//                this.nextMaintenanceDate = lastMaintenanceDate.plusMonths(1);
+//            } 
+//        }
+//    }
   
     public LocalDate getLastMaintenanceDate() {
         return lastMaintenanceDate;
