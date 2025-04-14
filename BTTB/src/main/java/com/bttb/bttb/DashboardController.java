@@ -30,13 +30,14 @@ public class DashboardController implements Initializable {
             
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        ObservableList<MaintenanceSchedule> schedules = null;
         try {
-            schedules = ss.getAllSchedules();
-        } catch (SQLException ex) {
-            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+        ObservableList<MaintenanceSchedule> schedules = ss.getAllSchedules();
+        if (schedules != null && !schedules.isEmpty()) {
+            MaintenanceScheduleController.showUpcomingMaintenance(schedules, 3);
         }
-        MaintenanceScheduleController.showUpcomingMaintenance(schedules, 7);
+    } catch (SQLException ex) {
+        Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+    }
     }    
     
 }

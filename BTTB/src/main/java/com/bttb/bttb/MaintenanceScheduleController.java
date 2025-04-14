@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -436,105 +437,6 @@ public class MaintenanceScheduleController implements Initializable {
         }
     }
 
-    @FXML
-    private void handleComplete() {
-        try {
-            // Lấy thông tin lịch bảo trì hiện tại từ UI hoặc database
-            int scheduleId = getSelectedScheduleId(); // Lấy ID lịch bảo trì đang được chọn
-            if (scheduleId == -1) {
-                showAlert(AlertType.WARNING, "Chưa chọn lịch bảo trì", "Vui lòng chọn lịch bảo trì cần hoàn thành.");
-                return;
-            }
-
-            // Lưu ngày hoàn thành vào cơ sở dữ liệu
-            LocalDate completedDate = LocalDate.now(); // Ngày hoàn thành là ngày hiện tại
-            boolean isUpdated = updateMaintenanceSchedule(scheduleId, completedDate);
-
-            if (isUpdated) {
-                // Tính toán ngày bảo trì tiếp theo dựa trên ngày hoàn thành
-                LocalDate nextMaintenanceDate = calculateNextMaintenanceDate(completedDate);
-
-                // Cập nhật lại ngày nhắc nhở bảo trì tiếp theo vào database
-                updateNextMaintenanceDate(scheduleId, nextMaintenanceDate);
-
-                // Hiển thị thông báo thành công
-                showAlert(AlertType.INFORMATION, "Hoàn thành bảo trì", "Bảo trì đã được hoàn thành và ngày bảo trì tiếp theo đã được cập nhật.");
-            } else {
-                showAlert(AlertType.ERROR, "Lỗi", "Có lỗi khi cập nhật ngày hoàn thành.");
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            showAlert(AlertType.ERROR, "Lỗi cơ sở dữ liệu", "Có lỗi trong quá trình xử lý.");
-        }
-    }
-
-    // Cập nhật ngày hoàn thành vào cơ sở dữ liệu
-    private boolean updateMaintenanceSchedule(int scheduleId, LocalDate completedDate) throws SQLException {
-        String sql = "UPDATE maintenance_schedule SET completed_date = ? WHERE id = ?";
-        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, Date.valueOf(completedDate));
-            stmt.setInt(2, scheduleId);
-            return stmt.executeUpdate() > 0; // Trả về true nếu cập nhật thành công
-        }
-    }
-
-    // Tính toán ngày bảo trì tiếp theo (ví dụ: mỗi tháng hoặc theo chu kỳ khác)
-    private LocalDate calculateNextMaintenanceDate(LocalDate completedDate) {
-        // Ví dụ tính toán ngày bảo trì tiếp theo là sau 1 tháng
-        return completedDate.plusMonths(1);
-    }
-
-    // Cập nhật ngày bảo trì tiếp theo vào cơ sở dữ liệu
-    private void updateNextMaintenanceDate(int scheduleId, LocalDate nextMaintenanceDate) throws SQLException {
-        String sql = "UPDATE maintenance_schedule SET next_maintenance_date = ? WHERE id = ?";
-        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, Date.valueOf(nextMaintenanceDate));
-            stmt.setInt(2, scheduleId);
-            stmt.executeUpdate(); // Cập nhật ngày bảo trì tiếp theo
-        }
-    }
-
-    // Hiển thị thông báo Alert
-    private void showAlert(AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    // Lấy ID của lịch bảo trì đang được chọn (Có thể lấy từ UI)
-    private int getSelectedScheduleId() {
-        // Đây là ví dụ, bạn cần lấy ID từ UI (bảng hoặc list)
-        return 1; // Lấy ID mẫu, bạn cần thay bằng cách lấy ID thực tế
-    }
-
-    private void completeMaintenance(MaintenanceSchedule ms) {
-        try {
-            // Lưu ngày hoàn thành vào cơ sở dữ liệu
-            LocalDate completedDate = LocalDate.now(); // Ngày hoàn thành là ngày hiện tại
-            boolean isUpdated = updateMaintenanceSchedule(ms.getId(), completedDate);
-
-            if (isUpdated) {
-                // Tính toán ngày bảo trì tiếp theo dựa trên ngày hoàn thành
-                LocalDate nextMaintenanceDate = calculateNextMaintenanceDate(completedDate);
-
-                // Cập nhật lại ngày bảo trì tiếp theo vào database
-                updateNextMaintenanceDate(ms.getId(), nextMaintenanceDate);
-
-                // Hiển thị thông báo thành công
-                showAlert(AlertType.INFORMATION, "Hoàn thành bảo trì", "Bảo trì đã được hoàn thành và ngày bảo trì tiếp theo đã được cập nhật.");
-            } else {
-                showAlert(AlertType.ERROR, "Lỗi", "Có lỗi khi cập nhật ngày hoàn thành.");
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            showAlert(AlertType.ERROR, "Lỗi cơ sở dữ liệu", "Có lỗi trong quá trình xử lý.");
-        }
-    }
-
     private void addActionButtonsToTable() {
         colAction.setCellFactory(param -> new TableCell<MaintenanceSchedule, Void>() {
             private final Button btnDelete = new Button("Xóa");
@@ -542,31 +444,31 @@ public class MaintenanceScheduleController implements Initializable {
             private final HBox pane = new HBox(10, btnDelete, btnComplete);
 
             {
-            btnDelete.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
-            btnComplete.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-            pane.setAlignment(Pos.CENTER);
+                btnDelete.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
+                btnComplete.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+                pane.setAlignment(Pos.CENTER);
 
-            btnDelete.setOnAction(evt -> {
-                MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
-                deleteSchedule(ms);
-            });
+                btnDelete.setOnAction(evt -> {
+                    MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
+                    deleteSchedule(ms);
+                });
 
-            btnComplete.setOnAction(evt -> {
-                MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
+                btnComplete.setOnAction(evt -> {
+                    MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
 
-                // Gọi service cập nhật completed_date và next_maintenance_date
-                boolean success = ss.completeSchedule(ms.getId(), LocalDate.now(), ms.getFrequency());
-                if (success) {
-                    ms.setCompletedDate(LocalDate.now());
+                    // Gọi service cập nhật completed_date và next_maintenance_date
+                    boolean success = ss.completeSchedule(ms.getId(), LocalDate.now(), ms.getFrequency());
+                    if (success) {
+                        ms.setCompletedDate(LocalDate.now());
 
-                    // Tính ngày bảo trì tiếp theo dựa vào completedDate
-                    ms.calculateNextMaintenanceDate(); 
+                        // Tính ngày bảo trì tiếp theo dựa vào completedDate
+                        ms.calculateNextMaintenanceDate();
 
-                    // Refresh lại bảng hoặc chỉ disable nút
-                    btnComplete.setDisable(true);
-                }
-            });
-        }
+                        // Refresh lại bảng hoặc chỉ disable nút
+                        btnComplete.setDisable(true);
+                    }
+                });
+            }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -728,7 +630,7 @@ public class MaintenanceScheduleController implements Initializable {
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Thông báo bảo trì định kỳ");
-        alert.setHeaderText("Danh sách thiết bị sắp được bảo trì");
+        alert.setHeaderText("Có " + upcoming.size() + " thiết bị cần bảo trì trong " + daysAhead + " ngày tới");
         alert.getDialogPane().setContent(textArea);
         alert.show();
     }
@@ -741,6 +643,7 @@ public class MaintenanceScheduleController implements Initializable {
                 .filter(s -> s.getScheduledDate() != null
                 && !s.getScheduledDate().isBefore(today)
                 && !s.getScheduledDate().isAfter(targetDate))
+                .sorted(Comparator.comparing(MaintenanceSchedule::getScheduledDate))
                 .collect(Collectors.toList());
     }
 

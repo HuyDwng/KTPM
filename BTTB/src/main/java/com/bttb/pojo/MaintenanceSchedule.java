@@ -124,7 +124,6 @@ public class MaintenanceSchedule {
 
     public void calculateNextMaintenanceDate() {
         if (completedDate != null) {
-            // Giả sử frequency là "monthly", bạn có thể thay đổi logic này tùy theo yêu cầu.
             if ("Hàng tuần".equalsIgnoreCase(frequency)) {
                 this.nextMaintenanceDate = completedDate.plusWeeks(1);
             } else if ("Hàng tháng".equalsIgnoreCase(frequency)) {
