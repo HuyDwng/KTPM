@@ -101,6 +101,16 @@ public class MaintenanceSchedule {
         return frequency;
     }
 
+    public void calculateNextMaintenanceDate() {
+        if (completedDate != null) {
+            if ("Hàng tuần".equalsIgnoreCase(frequency)) {
+                this.nextMaintenanceDate = completedDate.plusWeeks(1);
+            } else if ("Hàng tháng".equalsIgnoreCase(frequency)) {
+                this.nextMaintenanceDate = completedDate.plusMonths(1);
+            } 
+            
+        }
+  
     public LocalDate getLastMaintenanceDate() {
         return lastMaintenanceDate;
     }

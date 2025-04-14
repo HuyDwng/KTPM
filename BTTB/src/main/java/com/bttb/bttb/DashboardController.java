@@ -4,6 +4,16 @@
  */
 package com.bttb.bttb;
 
+//import com.bttb.pojo.MaintenanceSchedule;
+//import com.bttb.services.ScheduleServices;
+//import java.net.URL;
+//import java.sql.SQLException;
+
+//import java.util.ResourceBundle;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
+//import javafx.collections.ObservableList;
+//import javafx.fxml.Initializable;
 import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,6 +28,25 @@ import javafx.scene.layout.StackPane;
  *
  * @author nhanh
  */
+//public class DashboardController implements Initializable {
+
+    /**
+     * Initializes the controller class.
+     */
+    //private ScheduleServices ss = new ScheduleServices();
+    
+            
+    //@Override
+    //public void initialize(URL url, ResourceBundle rb) {
+        //try {
+        //ObservableList<MaintenanceSchedule> schedules = ss.getAllSchedules();
+        //if (schedules != null && !schedules.isEmpty()) {
+            //MaintenanceScheduleController.showUpcomingMaintenance(schedules, 3);
+        //}
+    //} catch (SQLException ex) {
+        //Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+    //}
+    //}    
 public class DashboardController {
 
     @FXML
@@ -70,5 +99,5 @@ public class DashboardController {
     private void btnLogout(ActionEvent event) {
         // TODO: Xử lý đăng xuất ở đây nếu cần
         System.out.println("Đăng xuất");
-    }
+    
 }
