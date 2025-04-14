@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -19,6 +20,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -77,11 +81,13 @@ public class MaintenanceScheduleController implements Initializable {
     @FXML
     private TableColumn<MaintenanceSchedule, String> colFrequency;
     @FXML
-    private TableColumn<MaintenanceSchedule, LocalDate> colNextDate;
+    private TableColumn<MaintenanceSchedule, LocalDate> colDeadlineDate;
     @FXML
     private TableColumn<MaintenanceSchedule, LocalDate> colCreatedAt;
     @FXML
     private TableColumn<MaintenanceSchedule, Void> colAction;
+    @FXML
+    private TableColumn<MaintenanceSchedule, LocalDate> colLastMaintenanceDate;
 
     private final ScheduleServices ss = new ScheduleServices();
     private ObservableList<Device> activeDevices;
@@ -118,6 +124,8 @@ public class MaintenanceScheduleController implements Initializable {
         Platform.runLater(() -> rootVBox.requestFocus());
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab == tabManagement) {
+                lblMessage.setVisible(false);
+                addActionButtons();
                 loadScheduleTableData();
             }
         });
@@ -302,35 +310,52 @@ public class MaintenanceScheduleController implements Initializable {
 
         Device selectedDevice = comboBoxDevices.getSelectionModel().getSelectedItem();
         LocalDate selectedDate = datePicker.getValue();
-        LocalDate nextMaintenanceDate = deadlinePicker.getValue();
+        LocalDate maintenancePeriod = deadlinePicker.getValue();
         LocalTime selectedTime = LocalTime.parse(txtTime.getText());
         String selectedFrequency = comboBoxFrequency.getSelectionModel().getSelectedItem();
         User selectedUser = (User) comboBoxExecutor.getValue();
         int executorId = selectedUser.getId();
         String executorName = selectedUser.toString();
 
-        LocalDateTime scheduleDateTime = LocalDateTime.of(selectedDate, selectedTime);
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-        if (ss.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime, selectedFrequency, executorId, nextMaintenanceDate)) {
+        if (ss.addMaintenanceSchedule(selectedDevice.getId(), selectedDate, selectedTime, selectedFrequency, executorId, maintenancePeriod)) {
             showSuccess("Lập lịch thành công!");
 
-            String toEmail = ScheduleServices.getExecutorEmail(executorId);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String content = String.format(
-                    "Thiết bị '%s' đã được lập lịch bảo trì vào lúc %s %s, với tần suất: %s.\n"
-                    + "Người thực hiện: %s.\nHạn bảo trì tiếp theo: %s.",
-                    selectedDevice.getName(),
-                    selectedDate.toString(),
-                    selectedTime.toString(),
-                    selectedFrequency,
-                    executorName,
-                    nextMaintenanceDate.format(formatter)
-            );
+            // Tính thời gian còn lại đến ngày bảo trì - 24 giờ
+            LocalDateTime maintenanceDateTime = LocalDateTime.of(selectedDate, selectedTime);
+            LocalDateTime emailTime = maintenanceDateTime.minusHours(24);
+            long delay = Duration.between(LocalDateTime.now(), emailTime).toMillis();
 
-            boolean emailSent = EmailUtils.sendEmail(toEmail, "Thông báo lập lịch bảo trì thiết bị", content);
-            if (!emailSent) {
-                showError("Lập lịch thành công nhưng gửi email thất bại!");
+            // Nếu delay > 0 thì mới đặt lịch gửi mail
+            if (delay > 0) {
+                Runnable sendEmailTask = () -> {
+                    String toEmail = ScheduleServices.getExecutorEmail(executorId);
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    String content = String.format(
+                            "Thiết bị '%s' sẽ được bảo trì vào lúc %s %s, với tần suất: %s.\n"
+                            + "Người thực hiện: %s.\nHạn bảo trì: %s.",
+                            selectedDevice.getName(),
+                            selectedDate.toString(),
+                            selectedTime.toString(),
+                            selectedFrequency,
+                            executorName,
+                            maintenancePeriod.format(formatter)
+                    );
+
+                    boolean emailSent = EmailUtils.sendEmail(toEmail, "Nhắc bảo trì thiết bị", content);
+                    if (!emailSent) {
+                        System.err.println("Gửi email nhắc thất bại!");
+                    }
+                };
+
+                scheduler.schedule(sendEmailTask, delay, TimeUnit.MILLISECONDS);
+            } else {
+                System.out.println("Thời gian bảo trì quá gần, không thể đặt email trước 24h.");
             }
+
+            //Load lại bảng
+            loadScheduleTableData();
         } else {
             showError("Lưu lịch bảo trì thất bại!");
         }
@@ -424,11 +449,12 @@ public class MaintenanceScheduleController implements Initializable {
             colScheduledDate.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getScheduledDate()));
             colScheduledTime.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getScheduledTime()));
             colFrequency.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getFrequency()));
-            colNextDate.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getNextMaintenanceDate()));
+            colDeadlineDate.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getMaintenancePeriod()));
             colCreatedAt.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getCreatedAt()));
-            addActionButtonsToTable();
+            colLastMaintenanceDate.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getLastMaintenanceDate()));
 
             scheduleTable.setItems(schedules);
+            scheduleTable.refresh();
             colId.setSortType(TableColumn.SortType.ASCENDING);
             scheduleTable.getSortOrder().add(colId);
             scheduleTable.sort();
@@ -437,52 +463,44 @@ public class MaintenanceScheduleController implements Initializable {
         }
     }
 
-    private void addActionButtonsToTable() {
-        colAction.setCellFactory(param -> new TableCell<MaintenanceSchedule, Void>() {
+    private void addActionButtons() {
+        colAction.setCellFactory(col -> new TableCell<>() {
             private final Button btnDelete = new Button("Xóa");
             private final Button btnComplete = new Button("Hoàn thành");
-            private final HBox pane = new HBox(10, btnDelete, btnComplete);
+            private final HBox box = new HBox(10, btnComplete, btnDelete);
 
             {
-                btnDelete.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
-                btnComplete.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-                pane.setAlignment(Pos.CENTER);
-
                 btnDelete.setOnAction(evt -> {
                     MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
-                    deleteSchedule(ms);
+                    handleDelete(ms);
                 });
 
                 btnComplete.setOnAction(evt -> {
                     MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
-
-                    // Gọi service cập nhật completed_date và next_maintenance_date
-                    boolean success = ss.completeSchedule(ms.getId(), LocalDate.now(), ms.getFrequency());
-                    if (success) {
-                        ms.setCompletedDate(LocalDate.now());
-
-                        // Tính ngày bảo trì tiếp theo dựa vào completedDate
-                        ms.calculateNextMaintenanceDate();
-
-                        // Refresh lại bảng hoặc chỉ disable nút
-                        btnComplete.setDisable(true);
-                    }
+                    handleComplete(ms);
                 });
+                btnDelete.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
+                btnComplete.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+                box.setAlignment(Pos.CENTER);
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
+
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    setGraphic(pane);
+                    MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
+                    boolean isCompleted = ms.getLastMaintenanceDate() != null;
+                    btnComplete.setDisable(isCompleted);
+                    setGraphic(box);
                 }
             }
         });
     }
 
-    private void deleteSchedule(MaintenanceSchedule ms) {
+    private void handleDelete(MaintenanceSchedule ms) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận xóa");
         alert.setHeaderText("Bạn có chắc muốn xóa lịch bảo trì này?");
@@ -503,6 +521,31 @@ public class MaintenanceScheduleController implements Initializable {
         }
     }
 
+    private void handleComplete(MaintenanceSchedule ms) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Xác nhận hoàn thành");
+        alert.setHeaderText("Xác nhận đã bảo trì thiết bị?");
+        alert.setContentText("Bạn có chắc chắn muốn đánh dấu lịch ID: " + ms.getId() + " là đã hoàn thành?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                LocalDate now = LocalDate.now();
+                boolean success = ss.markAsCompleted(ms.getId(), now);
+
+                if (success) {
+                    showInfo("Đã đánh dấu hoàn thành.");
+                    loadScheduleTableData();
+                    scheduleTable.refresh();
+                } else {
+                    showError("Không thể cập nhật lịch bảo trì.");
+                }
+            } catch (SQLException ex) {
+                showError("Lỗi SQL: " + ex.getMessage());
+            }
+        }
+    }
+
     private void showInfo(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Thông báo");
@@ -510,8 +553,55 @@ public class MaintenanceScheduleController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
+  
+    public static void showUpcomingMaintenance(List<MaintenanceSchedule> schedules, int daysAhead) {
+        List<MaintenanceSchedule> upcoming = getUpcomingSchedules(schedules, daysAhead);
 
-    //    private void setupComboBoxSearch() {
+        if (upcoming.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Thông báo bảo trì");
+            alert.setHeaderText("Không có lịch bảo trì sắp tới");
+            alert.setContentText("Chưa có thiết bị nào cần bảo trì trong " + daysAhead + " ngày tới.");
+            alert.show();
+            return;
+        }
+
+        StringBuilder content = new StringBuilder();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        for (MaintenanceSchedule s : upcoming) {
+            content.append("🔧 Thiết bị: ").append(s.getDeviceName())
+                    .append("\n👨‍🔧 Người thực hiện: ").append(s.getExecutorName())
+                    .append("\n📅 Ngày bảo trì: ").append(s.getNextMaintenanceDate().format(dateFormatter))
+                    .append(" lúc ").append(s.getScheduledTime())
+                    .append("\n-------------------------------------\n");
+        }
+
+        TextArea textArea = new TextArea(content.toString());
+        textArea.setWrapText(true);
+        textArea.setEditable(false);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Thông báo bảo trì định kỳ");
+        alert.setHeaderText("Có " + upcoming.size() + " thiết bị cần bảo trì trong " + daysAhead + " ngày tới");
+        alert.getDialogPane().setContent(textArea);
+        alert.show();
+    }
+
+    public static List<MaintenanceSchedule> getUpcomingSchedules(List<MaintenanceSchedule> schedules, int daysAhead) {
+        LocalDate today = LocalDate.now();
+        LocalDate targetDate = today.plusDays(daysAhead);
+
+        return schedules.stream()
+                .filter(s -> s.getScheduledDate() != null
+                && !s.getScheduledDate().isBefore(today)
+                && !s.getScheduledDate().isAfter(targetDate))
+                .sorted(Comparator.comparing(MaintenanceSchedule::getScheduledDate))
+                .collect(Collectors.toList());
+    }
+//    private void setupComboBoxSearch() {
 //        if (activeDevices == null || activeDevices.isEmpty()) {
 //            comboBoxDevices.getItems().clear();
 //            return;
@@ -599,52 +689,4 @@ public class MaintenanceScheduleController implements Initializable {
 //            }
 //        });
 //    }
-    public static void showUpcomingMaintenance(List<MaintenanceSchedule> schedules, int daysAhead) {
-        List<MaintenanceSchedule> upcoming = getUpcomingSchedules(schedules, daysAhead);
-
-        if (upcoming.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Thông báo bảo trì");
-            alert.setHeaderText("Không có lịch bảo trì sắp tới");
-            alert.setContentText("Chưa có thiết bị nào cần bảo trì trong " + daysAhead + " ngày tới.");
-            alert.show();
-            return;
-        }
-
-        StringBuilder content = new StringBuilder();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        for (MaintenanceSchedule s : upcoming) {
-            content.append("🔧 Thiết bị: ").append(s.getDeviceName())
-                    .append("\n👨‍🔧 Người thực hiện: ").append(s.getExecutorName())
-                    .append("\n📅 Ngày bảo trì: ").append(s.getNextMaintenanceDate().format(dateFormatter))
-                    .append(" lúc ").append(s.getScheduledTime())
-                    .append("\n-------------------------------------\n");
-        }
-
-        TextArea textArea = new TextArea(content.toString());
-        textArea.setWrapText(true);
-        textArea.setEditable(false);
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Thông báo bảo trì định kỳ");
-        alert.setHeaderText("Có " + upcoming.size() + " thiết bị cần bảo trì trong " + daysAhead + " ngày tới");
-        alert.getDialogPane().setContent(textArea);
-        alert.show();
-    }
-
-    public static List<MaintenanceSchedule> getUpcomingSchedules(List<MaintenanceSchedule> schedules, int daysAhead) {
-        LocalDate today = LocalDate.now();
-        LocalDate targetDate = today.plusDays(daysAhead);
-
-        return schedules.stream()
-                .filter(s -> s.getScheduledDate() != null
-                && !s.getScheduledDate().isBefore(today)
-                && !s.getScheduledDate().isAfter(targetDate))
-                .sorted(Comparator.comparing(MaintenanceSchedule::getScheduledDate))
-                .collect(Collectors.toList());
-    }
-
 }

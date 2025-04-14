@@ -109,6 +109,7 @@ public class DeviceServices {
         }
         return false;
     }
+
     public List<Device> getDevicesForRepair() throws SQLException{
         List<Device> devices = new ArrayList<>();
         try (Connection conn = JdbcUtils.getConn()) {
@@ -117,7 +118,7 @@ public class DeviceServices {
 
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"), rs.getInt("deviceTypeId"));
+                Device d = new Device(rs.getInt("id"), rs.getString("name"), rs.getString("status"), rs.getString("deviceTypeId"));
                 devices.add(d);
             }
 

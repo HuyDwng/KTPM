@@ -12,8 +12,6 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -61,7 +59,7 @@ public class ScheduleServices {
 
     // Thêm lịch bảo trì mới vào database
     public boolean addMaintenanceSchedule(int deviceId, LocalDate scheduleDate, LocalTime scheduleTime, String frequency, int executorId, LocalDate nextMaintenanceDate) throws SQLException {
-        String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor_id, next_maintenance_date) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor_id, maintenance_period) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(query)) {
             stm.setInt(1, deviceId);
             stm.setDate(2, Date.valueOf(scheduleDate));
@@ -98,11 +96,12 @@ public class ScheduleServices {
         try (Connection conn = JdbcUtils.getConn()) {
             String sql = "SELECT ms.id, d.name AS device_name, u.name AS executor_name, "
                     + "ms.scheduled_date, ms.scheduled_time, ms.frequency, "
-                    + "ms.next_maintenance_date, ms.created_at, ms.completed_date "
+                    //+ "ms.next_maintenance_date, ms.created_at, ms.completed_date "
+                    + "ms.maintenance_period, ms.created_at, ms.last_maintenance_date "
                     + "FROM maintenance_schedule ms "
                     + "JOIN device d ON ms.device_id = d.id "
                     + "JOIN user u ON ms.executor_id = u.id "
-                    + "ORDER BY ms.scheduled_date DESC";
+                    + "ORDER BY ms.id DESC";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
@@ -115,8 +114,9 @@ public class ScheduleServices {
                         rs.getDate("scheduled_date").toLocalDate(),
                         rs.getTime("scheduled_time").toLocalTime(),
                         rs.getString("frequency"),
-                        rs.getDate("next_maintenance_date") != null ? rs.getDate("next_maintenance_date").toLocalDate() : null,
-                        rs.getDate("created_at") != null ? rs.getDate("created_at").toLocalDate() : null
+                        rs.getDate("maintenance_period") != null ? rs.getDate("maintenance_period").toLocalDate() : null,
+                        rs.getDate("created_at") != null ? rs.getDate("created_at").toLocalDate() : null,
+                        rs.getDate("last_maintenance_date") != null ? rs.getDate("last_maintenance_date").toLocalDate() : null
                 );
 
                 list.add(m);
@@ -167,6 +167,13 @@ public class ScheduleServices {
         } catch (SQLException e) {
             System.err.println("Lỗi cập nhật completed_date: " + e.getMessage());
             return false;
+
+    public boolean markAsCompleted(int scheduleId, LocalDate completedDate) throws SQLException {
+        String sql = "UPDATE maintenance_schedule SET last_maintenance_date = ? WHERE id = ?";
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setDate(1, java.sql.Date.valueOf(completedDate));
+            stm.setInt(2, scheduleId);
+            return stm.executeUpdate() > 0;
         }
     }
 

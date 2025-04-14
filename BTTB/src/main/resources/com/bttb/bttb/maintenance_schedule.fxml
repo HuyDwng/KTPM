@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<TabPane fx:id="tabPane" prefHeight="419.0" prefWidth="955.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
+<TabPane fx:id="tabPane" prefHeight="416.0" prefWidth="993.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.MaintenanceScheduleController">
 
     <tabs>
         <!-- Tab Lập lịch -->
@@ -168,17 +168,16 @@
                   </HBox>
                   <TableView fx:id="scheduleTable" prefHeight="361.0" prefWidth="826.0">
                     <columns>
-                      <TableColumn fx:id="colId" prefWidth="48.799986243247986" text="ID" />
-                      <TableColumn fx:id="colDevice" prefWidth="175.20001983642578" text="Thiết bị" />
-                        <TableColumn fx:id="colScheduledDate" prefWidth="92.79998779296875" text="Ngày bảo trì" />
-                        <TableColumn fx:id="colScheduledTime" minWidth="4.0" prefWidth="48.0" text="Giờ" />
-                        <TableColumn fx:id="colFrequency" prefWidth="83.20001220703125" text="Tần suất" />
-                        <TableColumn fx:id="colExecutor" prefWidth="169.59994506835938" text="Kỹ thuật viên" />
-                        <TableColumn fx:id="colNextDate" prefWidth="104.800048828125" text="Bảo trì tiếp theo" />
-                        <TableColumn fx:id="colCreatedAt" prefWidth="100.80002441406248" text="Ngày tạo" />
-                        <TableColumn fx:id="colAction" prefWidth="135.2000732421875" text="Hành động" />
-                        
-
+                      <TableColumn fx:id="colId" prefWidth="35.20001298189163" text="ID" />
+                      <TableColumn fx:id="colDevice" prefWidth="169.59997177124023" text="Thiết bị" />
+                        <TableColumn fx:id="colScheduledDate" prefWidth="77.60002136230469" text="Ngày bảo trì" />
+                        <TableColumn fx:id="colScheduledTime" minWidth="4.0" prefWidth="39.2000732421875" text="Giờ" />
+                        <TableColumn fx:id="colFrequency" prefWidth="74.39996337890625" text="Tần suất" />
+                        <TableColumn fx:id="colExecutor" prefWidth="174.4000244140625" text="Kỹ thuật viên" />
+                        <TableColumn fx:id="colDeadlineDate" prefWidth="78.39996337890625" text="Hạn bảo trì" />
+                        <TableColumn fx:id="colCreatedAt" minWidth="0.0" prefWidth="80.800048828125" text="Ngày tạo" />
+                        <TableColumn fx:id="colLastMaintenanceDate" prefWidth="100.00006103515625" text="Bảo trì gần nhất" />
+                        <TableColumn fx:id="colAction" prefWidth="163.199951171875" text="Hành động" />
                     </columns>
                   </TableView>
                </children>

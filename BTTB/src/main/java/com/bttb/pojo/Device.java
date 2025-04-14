@@ -33,14 +33,6 @@ public class Device {
         this.deviceTypeId = deviceTypeId;
     }
     
-    
-    
-    
-
-    
-
-    
-  
     public Device() {
     }
 
@@ -60,12 +52,12 @@ public class Device {
         this.status = status;
     }
     
-     public Device(int id, String name, String status, int deviceTypeId) {
-        this.id = id;
-        this.name = name;
-        this.status = status;
-        this.deviceTypeId = deviceTypeId;
-    }
+//     public Device(int id, String name, String status, int deviceTypeId) {
+//        this.id = id;
+//        this.name = name;
+//        this.status = status;
+//        this.deviceTypeId = deviceTypeId;
+//    }
   
     public int getId() {
         return id;
