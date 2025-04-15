@@ -17,9 +17,13 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("dashboard"));
+        scene = new Scene(loadFXML("add_technician"));
         stage.setScene(scene);
         stage.sizeToScene(); //update size theo fxml
+        stage.setResizable(false);
+        stage.setTitle("Quản lý thiết bị");
+//        Image icon = new Image(getClass().getResourceAsStream("/com/milkyway/healthmanagement/image/image.jpg"));
+//        stage.getIcons().add(icon);
         stage.show();
     }
 
@@ -31,9 +35,7 @@ public class App extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
-    
-    
-    
+
     public static void main(String[] args) {
         launch();
     }

@@ -1,0 +1,85 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.bttb.bttb;
+
+import com.bttb.pojo.User;
+import com.bttb.services.UserServices;
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+
+/**
+ *
+ * @author LEGION
+ */
+public class RegisterController implements Initializable {
+
+    @FXML
+    private TextField txtName;
+    @FXML
+    private TextField txtUsername;
+    @FXML
+    private PasswordField txtPassword;
+    @FXML
+    private PasswordField txtRePassword;
+    @FXML
+    private TextField txtEmail;
+    @FXML
+    private Label lblMessage;
+
+    private final UserServices userServices = new UserServices();
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        lblMessage.setText(""); 
+    }
+
+    @FXML
+    private void handleRegister(ActionEvent event) {
+        String name = txtName.getText().trim();
+        String username = txtUsername.getText().trim();
+        String password = txtPassword.getText();
+        String rePassword = txtRePassword.getText();
+        String email = txtEmail.getText().trim();
+
+        if (name.isEmpty() || username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+            lblMessage.setText("Vui lòng điền đầy đủ thông tin!");
+            return;
+        }
+
+        if (!password.equals(rePassword)) {
+            lblMessage.setText("Mật khẩu không khớp!");
+            return;
+        }
+
+        try {
+            User newUser = new User(name, email, username, password, "technician"); // role mặc định là 'user'
+            boolean success = userServices.addUser(newUser);
+
+            if (success) {
+                lblMessage.setText("Đăng ký thành công!");
+                clearForm();
+            } else {
+                lblMessage.setText("Đăng ký thất bại!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblMessage.setText("Lỗi: " + e.getMessage());
+        }
+    }
+
+    private void clearForm() {
+        txtName.clear();
+        txtUsername.clear();
+        txtPassword.clear();
+        txtRePassword.clear();
+        txtEmail.clear();
+    }
+}
