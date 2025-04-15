@@ -318,7 +318,6 @@ public class MaintenanceScheduleController implements Initializable {
             LocalDateTime maintenanceDateTime = LocalDateTime.of(selectedDate, selectedTime);
             LocalDateTime emailTime = maintenanceDateTime.minusHours(24);
             long delay = Duration.between(LocalDateTime.now(), emailTime).toMillis();
-
             // Nếu delay > 0 thì mới đặt lịch gửi mail
             if (delay > 0) {
                 Runnable sendEmailTask = () -> {

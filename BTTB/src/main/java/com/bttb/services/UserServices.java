@@ -42,4 +42,18 @@ public class UserServices {
         return technicians;
     }
 
+    public boolean addUser(User u) throws SQLException {
+        try (Connection conn = JdbcUtils.getConn()) {
+            String sql = "INSERT INTO user(name, email, username, password, role) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement stm = conn.prepareStatement(sql);
+            stm.setString(1, u.getName());
+            stm.setString(2, u.getEmail());
+            stm.setString(3, u.getUsername());
+            stm.setString(4, u.getPassword()); // sau này có thể hash ở đây
+            stm.setString(5, u.getRole());
+
+            return stm.executeUpdate() > 0;
+        }
+    }
+
 }
