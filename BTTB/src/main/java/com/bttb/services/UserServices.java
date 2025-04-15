@@ -42,4 +42,25 @@ public class UserServices {
         return technicians;
     }
 
+    public User getUserByUsernameAndRole(String username, String role) throws SQLException {
+        Connection conn = JdbcUtils.getConn();
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM user WHERE username = ? AND role = ?");
+        stmt.setString(1, username);
+        stmt.setString(2, role);
+
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return new User(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("role")
+            );
+        }
+
+        return null;
+    }
+
 }

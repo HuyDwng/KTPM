@@ -8,9 +8,6 @@ public class DeviceType {
     private int id;
     private String name;
 
-    public DeviceType() {
-    }
-
     public DeviceType(int id, String name) {
         this.id = id;
         this.name = name;

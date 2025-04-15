@@ -1,13 +1,16 @@
 package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
+import com.bttb.pojo.DeviceType;
 import com.bttb.services.DeviceServices;
+import com.bttb.services.DeviceTypeService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class Add_deviceController {
 
@@ -15,27 +18,36 @@ public class Add_deviceController {
     private TextField txtName;
     @FXML
     private ComboBox<String> statusComboBox;
-    
+    @FXML
+    private ComboBox<DeviceType> typeComboBox;
+
     private DeviceServices deviceService;
+    private DeviceTypeService deviceTypeService;
 
     public void setDeviceManagementController(Device_managementController controller) {
         this.deviceService = new DeviceServices(controller);
+        this.deviceTypeService = new DeviceTypeService();
     }
 
     public void addDevice() {
         String name = txtName.getText();
         String status = statusComboBox.getValue();
-
-        if (name.isEmpty() || status.isEmpty()) {
+        DeviceType selectedType = typeComboBox.getValue();
+        
+        if (name.isEmpty() || status == null || selectedType == null) {
             showAlert("Vui lòng nhập đầy đủ thông tin!", Alert.AlertType.ERROR);
             return;
         }
+//        System.out.print(selectedType);
+//        System.out.print(selectedType.getId());
 
-        Device device = new Device(name, status);
+        Device device = new Device(name, status, selectedType.getId());
+        System.out.println(device);
         boolean success = deviceService.addDevice(device);
 
         if (success) {
             showAlert("Thêm thiết bị thành công!", Alert.AlertType.INFORMATION);
+            ((Stage) txtName.getScene().getWindow()).close();
 
         } else {
             showAlert("Lỗi khi thêm thiết bị!", Alert.AlertType.ERROR);
@@ -52,9 +64,12 @@ public class Add_deviceController {
     public void initialize() {
         // Danh sách trạng thái thiết bị
         ObservableList<String> statusList = FXCollections.observableArrayList("Đang hoạt động", "Hỏng hóc", "Đang sửa");
+        this.deviceTypeService = new DeviceTypeService();
         statusComboBox.setItems(statusList);
 
-        // Đặt giá trị mặc định
-        statusComboBox.setValue("Đang Hoạt động");
+        statusComboBox.setValue("Đang hoạt động");
+        
+        ObservableList<DeviceType> typeList = FXCollections.observableArrayList(deviceTypeService.getAllDeviceTypes());
+        typeComboBox.setItems(typeList);
     }
 }
