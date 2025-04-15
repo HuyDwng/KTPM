@@ -36,6 +36,14 @@ public class User {
         this.role = role;
     }
 
+    public User(String name, String email, String username, String password, String role) {
+        this.name = name;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
     public User(int id, String name) {
         this.id = id;
         this.name = name;
@@ -115,4 +123,9 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 }
