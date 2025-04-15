@@ -60,7 +60,7 @@ public class RegisterController implements Initializable {
         }
 
         try {
-            User newUser = new User(name, email, username, password, "technician"); // role mặc định là 'user'
+            User newUser = new User(name, email, username, password, "technician"); 
             boolean success = userServices.addUser(newUser);
 
             if (success) {
