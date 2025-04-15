@@ -2,7 +2,7 @@ package com.bttb.services;
 
 import com.bttb.pojo.JdbcUtils;
 import com.bttb.pojo.User;
-
+import com.bttb.services.HashUtils;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +42,27 @@ public class UserServices {
         return technicians;
     }
 
+    public User getUserByUsernameAndRole(String username, String role) throws SQLException {
+        Connection conn = JdbcUtils.getConn();
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM user WHERE username = ? AND role = ?");
+        stmt.setString(1, username);
+        stmt.setString(2, role);
+
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return new User(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("role")
+            );
+        }
+
+        return null;
+    }
+
     public boolean addUser(User u) throws SQLException {
         try (Connection conn = JdbcUtils.getConn()) {
             String sql = "INSERT INTO user(name, email, username, password, role) VALUES (?, ?, ?, ?, ?)";
@@ -49,11 +70,13 @@ public class UserServices {
             stm.setString(1, u.getName());
             stm.setString(2, u.getEmail());
             stm.setString(3, u.getUsername());
-            stm.setString(4, u.getPassword()); // sau này có thể hash ở đây
+            String hashedPassword = HashUtils.hashPassword(u.getPassword());
+            stm.setString(4, hashedPassword); // sau này có thể hash ở đây
             stm.setString(5, u.getRole());
 
             return stm.executeUpdate() > 0;
         }
+
     }
 
 }

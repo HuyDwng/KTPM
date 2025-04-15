@@ -38,7 +38,7 @@ public class RegisterController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        lblMessage.setText(""); 
+        lblMessage.setText("");
     }
 
     @FXML
@@ -54,13 +54,26 @@ public class RegisterController implements Initializable {
             return;
         }
 
+        // Regex kiểm tra mật khẩu mạnh
+        String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!()_\\-{}\\[\\]:;\"'<>,.?/~`|\\\\]).{8,}$";
+
+        if (!password.matches(passwordRegex)) {
+            lblMessage.setText("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.");
+            return;
+        }
+
         if (!password.equals(rePassword)) {
             lblMessage.setText("Mật khẩu không khớp!");
             return;
         }
 
+        if (!isValidEmail(email)) {
+            lblMessage.setText("Email không hợp lệ!");
+            return;
+        }
+
         try {
-            User newUser = new User(name, email, username, password, "technician"); // role mặc định là 'user'
+            User newUser = new User(name, email, username, password, "technician"); // role mặc định
             boolean success = userServices.addUser(newUser);
 
             if (success) {
@@ -82,4 +95,15 @@ public class RegisterController implements Initializable {
         txtRePassword.clear();
         txtEmail.clear();
     }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        return email.matches(emailRegex);
+    }
+
+    private boolean isValidPassword(String password) {
+        String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!()_\\-{}\\[\\]:;\"'<>,.?/~`|\\\\]).{8,}$";
+        return password.matches(passwordRegex);
+    }
+
 }

@@ -13,7 +13,7 @@ public class JdbcUtils {
     }
     
     public static Connection getConn() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/bttbdb", "root", "Admin@123");
+        return DriverManager.getConnection("jdbc:mysql://localhost/bttbdb", "root", "123456");
 
     }
 }

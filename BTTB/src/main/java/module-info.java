@@ -10,5 +10,7 @@ module com.bttb.bttb {
     exports com.bttb.bttb;
     exports com.bttb.services;
     exports com.bttb.pojo;
+//    requires jbcrypt;
+    requires jbcrypt;
     
 }

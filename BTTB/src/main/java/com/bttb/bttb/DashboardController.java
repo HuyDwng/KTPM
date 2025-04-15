@@ -8,7 +8,6 @@ package com.bttb.bttb;
 //import com.bttb.services.ScheduleServices;
 //import java.net.URL;
 //import java.sql.SQLException;
-
 //import java.util.ResourceBundle;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
@@ -38,24 +37,22 @@ import javafx.scene.layout.StackPane;
  * @author nhanh
  */
 //public class DashboardController implements Initializable {
-
-    /**
-     * Initializes the controller class.
-     */
-    
-    //}    
-public class DashboardController implements Initializable{
+/**
+ * Initializes the controller class.
+ */
+//}    
+public class DashboardController implements Initializable {
 
     @FXML
     private StackPane contentPane;
 
     @FXML
-    private Button btnDevice, btnSchedule, btnRepairHistory, btnLogout;
+    private Button btnDevice, btnSchedule, btnRepairHistory, btnLogout, btnAddTechnician;
 
     private void loadView(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent view = loader.load(); 
+            Parent view = loader.load();
 
             contentPane.getChildren().clear();
             contentPane.getChildren().add(view);
@@ -86,20 +83,22 @@ public class DashboardController implements Initializable{
         loadView("/com/bttb/bttb/repair_history.fxml");
     }
 
+    @FXML
+    private void openAddTechnician(ActionEvent event) {
+        loadView("/com/bttb/bttb/add_technician.fxml");
+    }
+
 //    @FXML
 //    private void initialize() {
 //        // Optionally load default view
 //        openDeviceManagement(null);
 //    }
-
     @FXML
     private void btnLogout(ActionEvent event) {
         // TODO: Xử lý đăng xuất ở đây nếu cần
         System.out.println("Đăng xuất");
     }
 
-    
-            
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ScheduleServices ss = new ScheduleServices();
@@ -109,7 +108,7 @@ public class DashboardController implements Initializable{
                 MaintenanceScheduleController.showUpcomingMaintenance(schedules, 3);
             }
         } catch (SQLException ex) {
-        Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

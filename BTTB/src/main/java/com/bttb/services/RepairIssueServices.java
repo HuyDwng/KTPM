@@ -35,26 +35,28 @@ public class RepairIssueServices {
         return list;
     }
 
-    public List<RepairIssue> getRepairIssuesByDeviceType(int deviceTypeId) throws SQLException {
-        List<RepairIssue> list = new ArrayList<>();
+    public List<RepairIssue> getRepairIssuesByDeviceId(String deviceId) throws SQLException {
+        List<RepairIssue> issues = new ArrayList<>();
 
-        try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT * FROM repair_issue WHERE device_type_id = ?";
-            PreparedStatement stm = conn.prepareStatement(sql);
-            stm.setInt(1, deviceTypeId);
+        String sql = "SELECT ri.id, ri.name, ri.cost, ri.device_type_id FROM device d "
+                + "JOIN repair_issue ri ON d.device_type_id = ri.device_type_id "
+                + "WHERE d.id = ?";
+
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setString(1, deviceId);
             ResultSet rs = stm.executeQuery();
 
             while (rs.next()) {
-                RepairIssue ri = new RepairIssue(
+                RepairIssue issue = new RepairIssue(
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getInt("device_type_id"),
                         rs.getDouble("cost")
                 );
-                list.add(ri);
+                issues.add(issue);
             }
         }
 
-        return list;
-    }   
+        return issues;
+    }
 }
