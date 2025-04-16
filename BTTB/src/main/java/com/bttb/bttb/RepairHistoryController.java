@@ -85,7 +85,7 @@ public class RepairHistoryController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         tableIssueList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        
+
         setupTableColumns();
         loadRepairHistoryData();
         loadTechnicians();
@@ -123,11 +123,11 @@ public class RepairHistoryController implements Initializable {
 
         // Truy vấn lại Device từ ID
         Device selectedDevice = deviceServices.getDeviceById(deviceId);
-        
+
         if (selectedDevice != null) {
 
             loadRepairIssuesForDevice(String.valueOf(deviceId));
-            
+
         }
     }
 
@@ -311,17 +311,22 @@ public class RepairHistoryController implements Initializable {
         }
 
         String deviceName = selectedDevice.getName();
-        
+
         LocalDate repairDate;
         repairDate = datePicker.getValue();
         if (technicianId == -1 || repairDate == null || selectedTime == null) {
             showError("Vui lòng điền đầy đủ thông tin.");
             return;
         }
+
         LocalDateTime repairDateTime = LocalDateTime.of(repairDate, selectedTime);
 
         if (repairDateTime.isBefore(LocalDateTime.now())) {
             showError("Thời gian lập lịch phải ở tương lai!");
+            return;
+        }
+        if (repairHistoryService.isTechnicianBusy(technicianId)) {
+            showError("Kỹ thuật viên đã có lịch vào thời gian này!");
             return;
         }
         // Danh sách lỗi được chọn
@@ -347,12 +352,11 @@ public class RepairHistoryController implements Initializable {
                 issueNames,
                 repairDateTime,
                 null,
-                "Chưa hoàn thành",
+                "Đang sửa",
                 totalCost
         );
         newRepair.setTechnicianName(technicianName);
         newRepair.setDeviceName(deviceName);
-        
 
         // Gọi service để lưu
         try {
@@ -415,8 +419,7 @@ public class RepairHistoryController implements Initializable {
             // Kiểm tra nếu repairHistories không phải null và không rỗng
             if (repairHistories != null && !repairHistories.isEmpty()) {
                 tableRepairHistory.setItems(FXCollections.observableList(repairHistories));
-            } else {
-                showError("Không có dữ liệu lịch sửa chữa để hiển thị.");
+
             }
         } catch (SQLException e) {
             showError("Lỗi khi tải dữ liệu lịch sửa chữa: " + e.getMessage());
@@ -438,21 +441,4 @@ public class RepairHistoryController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    private boolean isTechnicianBusy(String technician) {
-        try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT COUNT(*) FROM repair_history WHERE technician_id = ? AND status = 'Chưa hoàn thành'";
-            PreparedStatement stm = conn.prepareStatement(sql);
-            stm.setString(1, technician);
-            ResultSet rs = stm.executeQuery();
-
-            if (rs.next() && rs.getInt(1) > 0) {
-                return true; // Kỹ thuật viên đang có lịch sửa chữa chưa hoàn thành
-            }
-        } catch (SQLException e) {
-            showError("Lỗi kiểm tra lịch sửa chữa: " + e.getMessage());
-        }
-        return false; // Kỹ thuật viên không bận
-    }
-
 }

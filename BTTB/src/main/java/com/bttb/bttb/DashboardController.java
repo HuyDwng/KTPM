@@ -14,6 +14,7 @@ package com.bttb.bttb;
 //import javafx.collections.ObservableList;
 //import javafx.fxml.Initializable;
 import com.bttb.pojo.MaintenanceSchedule;
+import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.io.IOException;
 import java.net.URL;
@@ -101,6 +102,7 @@ public class DashboardController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
         ScheduleServices ss = new ScheduleServices();
         try {
             ObservableList<MaintenanceSchedule> schedules = ss.getAllSchedules();
@@ -111,4 +113,7 @@ public class DashboardController implements Initializable {
             Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+   
+
 }
