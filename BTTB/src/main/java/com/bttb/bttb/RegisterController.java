@@ -7,6 +7,7 @@ package com.bttb.bttb;
 import com.bttb.pojo.User;
 import com.bttb.services.UserServices;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -49,14 +50,33 @@ public class RegisterController implements Initializable {
         String rePassword = txtRePassword.getText();
         String email = txtEmail.getText().trim();
 
-        if (name.isEmpty() || username.isEmpty() || password.isEmpty() || email.isEmpty()) {
-            lblMessage.setText("Vui lòng điền đầy đủ thông tin!");
+        if (name.isEmpty()) {
+            lblMessage.setText("Vui lòng nhập họ tên!");
+            return;
+        }
+
+        if (username.isEmpty()) {
+            lblMessage.setText("Vui lòng nhập tên đăng nhập!");
+            return;
+        }
+
+        if (password.isEmpty()) {
+            lblMessage.setText("Vui lòng nhập mật khẩu!");
+            return;
+        }
+
+        if (rePassword.isEmpty()) {
+            lblMessage.setText("Vui lòng nhập lại mật khẩu!");
+            return;
+        }
+
+        if (email.isEmpty()) {
+            lblMessage.setText("Vui lòng nhập email!");
             return;
         }
 
         // Regex kiểm tra mật khẩu mạnh
         String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!()_\\-{}\\[\\]:;\"'<>,.?/~`|\\\\]).{8,}$";
-
         if (!password.matches(passwordRegex)) {
             lblMessage.setText("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.");
             return;
@@ -73,16 +93,16 @@ public class RegisterController implements Initializable {
         }
 
         try {
-            User newUser = new User(name, email, username, password, "technician"); // role mặc định
+            User newUser = new User(name, email, username, password, "technician");
             boolean success = userServices.addUser(newUser);
 
             if (success) {
                 lblMessage.setText("Đăng ký thành công!");
                 clearForm();
             } else {
-                lblMessage.setText("Đăng ký thất bại!");
+                lblMessage.setText("Đăng ký thất bại! Tên đăng nhập hoặc email có thể đã tồn tại.");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             lblMessage.setText("Lỗi: " + e.getMessage());
         }

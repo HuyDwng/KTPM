@@ -2,14 +2,10 @@ package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.EmailUtils;
-import com.bttb.pojo.JdbcUtils;
 import com.bttb.pojo.MaintenanceSchedule;
 import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -34,9 +30,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 public class MaintenanceScheduleController implements Initializable {
@@ -46,8 +40,6 @@ public class MaintenanceScheduleController implements Initializable {
     @FXML
     private Tab tabManagement;
 //    Lập lịch
-    @FXML
-    private VBox rootVBox;
     @FXML
     private ComboBox<Device> comboBoxDevices;
     @FXML
@@ -120,8 +112,7 @@ public class MaintenanceScheduleController implements Initializable {
                 Logger.getLogger(MaintenanceScheduleController.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-
-        Platform.runLater(() -> rootVBox.requestFocus());
+        
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab == tabManagement) {
                 lblMessage.setVisible(false);
@@ -419,7 +410,7 @@ public class MaintenanceScheduleController implements Initializable {
                 showError("Thiết bị này đã có lịch bảo trì!");
                 return false;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             showError("Lỗi kiểm tra trùng lịch: " + e.getMessage());
             return false;
         }
@@ -569,9 +560,9 @@ public class MaintenanceScheduleController implements Initializable {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         for (MaintenanceSchedule s : upcoming) {
-            content.append("🔧 Thiết bị: ").append(s.getDeviceName())
-                    .append("\n👨‍🔧 Người thực hiện: ").append(s.getExecutorName())
-                    .append("\n📅 Ngày bảo trì: ").append(s.getLastMaintenanceDate())
+            content.append("Thiết bị: ").append(s.getDeviceName())
+                    .append("\nNgười thực hiện: ").append(s.getExecutorName())
+                    .append("\nNgày bảo trì: ").append(s.getLastMaintenanceDate())
                     .append(" lúc ").append(s.getScheduledTime())
                     .append("\n-------------------------------------\n");
         }
@@ -600,92 +591,4 @@ public class MaintenanceScheduleController implements Initializable {
                 .sorted(Comparator.comparing(MaintenanceSchedule::getScheduledDate))
                 .collect(Collectors.toList());
     }
-//    private void setupComboBoxSearch() {
-//        if (activeDevices == null || activeDevices.isEmpty()) {
-//            comboBoxDevices.getItems().clear();
-//            return;
-//        }
-//
-//        comboBoxDevices.setEditable(true);
-//
-//        // Dùng FilteredList để hỗ trợ tìm kiếm
-//        FilteredList<Device> filteredList = new FilteredList<>(activeDevices, p -> true);
-//        comboBoxDevices.setItems(filteredList);
-//
-//        // Tìm kiếm theo tên hoặc ID
-//        comboBoxDevices.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
-//            filteredList.setPredicate(device -> {
-//                if (newVal == null || newVal.isEmpty()) {
-//                    return true;
-//                }
-//                String lower = newVal.toLowerCase();
-//                return device.getName().toLowerCase().contains(lower)
-//                        || String.valueOf(device.getId()).contains(lower);
-//            });
-//
-//            // Đảm bảo không thao tác select nếu list bị rỗng
-//            if (!filteredList.isEmpty()) {
-//                comboBoxDevices.show(); // đảm bảo show lại list sau filter
-//            } else {
-//                comboBoxDevices.hide(); // ẩn nếu rỗng để tránh bug UI
-//            }
-//        });
-//
-//        // Converter giữa object và chuỗi hiển thị
-//        comboBoxDevices.setConverter(new StringConverter<>() {
-//            @Override
-//            public String toString(Device device) {
-//                return (device == null) ? "" : String.format("ID: %d - %s", device.getId(), device.getName());
-//            }
-//
-//            @Override
-//            public Device fromString(String string) {
-//                return activeDevices.stream()
-//                        .filter(d -> String.format("ID: %d - %s", d.getId(), d.getName()).equalsIgnoreCase(string)
-//                        || d.getName().equalsIgnoreCase(string))
-//                        .findFirst().orElse(null);
-//            }
-//        });
-//
-//        // Cell hiển thị trong danh sách dropdown
-//        comboBoxDevices.setCellFactory(cb -> new ListCell<>() {
-//            @Override
-//            protected void updateItem(Device item, boolean empty) {
-//                super.updateItem(item, empty);
-//                setText(empty || item == null ? null : String.format("ID: %d - %s", item.getId(), item.getName()));
-//            }
-//        });
-//
-//        // Cell hiển thị ở nút chính
-//        comboBoxDevices.setButtonCell(new ListCell<>() {
-//            @Override
-//            protected void updateItem(Device item, boolean empty) {
-//                super.updateItem(item, empty);
-//                setText(empty || item == null ? null : String.format("ID: %d - %s", item.getId(), item.getName()));
-//            }
-//        });
-//
-//        // Show dropdown khi editor được focus
-//        comboBoxDevices.getEditor().focusedProperty().addListener((obs, oldVal, newVal) -> {
-//            if (newVal) {
-//                comboBoxDevices.show();
-//            } else {
-//                String input = comboBoxDevices.getEditor().getText();
-//                Device matched = filteredList.stream()
-//                        .filter(d -> String.format("ID: %d - %s", d.getId(), d.getName()).equalsIgnoreCase(input)
-//                        || d.getName().equalsIgnoreCase(input))
-//                        .findFirst()
-//                        .orElse(null);
-//
-//                if (matched != null) {
-//                    // Chỉ select nếu filteredList có phần tử
-//                    if (!filteredList.isEmpty()) {
-//                        comboBoxDevices.getSelectionModel().select(matched);
-//                    }
-//                } else {
-//                    comboBoxDevices.getSelectionModel().clearSelection();
-//                }
-//            }
-//        });
-//    }
 }

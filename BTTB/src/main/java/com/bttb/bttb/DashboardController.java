@@ -19,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -58,12 +59,9 @@ public class DashboardController implements Initializable {
             contentPane.getChildren().clear();
             contentPane.getChildren().add(view);
 
-            if (view instanceof AnchorPane) {
-                AnchorPane.setTopAnchor(view, 0.0);
-                AnchorPane.setBottomAnchor(view, 0.0);
-                AnchorPane.setLeftAnchor(view, 0.0);
-                AnchorPane.setRightAnchor(view, 0.0);
-            }
+            // Căn giữa view trong StackPane
+            StackPane.setAlignment(view, Pos.CENTER);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -89,11 +87,6 @@ public class DashboardController implements Initializable {
         loadView("/com/bttb/bttb/add_technician.fxml");
     }
 
-//    @FXML
-//    private void initialize() {
-//        // Optionally load default view
-//        openDeviceManagement(null);
-//    }
     @FXML
     private void btnLogout(ActionEvent event) {
         // TODO: Xử lý đăng xuất ở đây nếu cần
@@ -129,5 +122,7 @@ public class DashboardController implements Initializable {
         } catch (SQLException ex) {
             Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        openDeviceManagement(null);
     }
 }
