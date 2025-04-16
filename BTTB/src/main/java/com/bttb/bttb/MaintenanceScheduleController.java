@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -19,6 +21,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -411,7 +414,7 @@ public class MaintenanceScheduleController implements Initializable {
                 showError("Thiết bị này đã có lịch bảo trì!");
                 return false;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             showError("Lỗi kiểm tra trùng lịch: " + e.getMessage());
             return false;
         }
@@ -470,7 +473,8 @@ public class MaintenanceScheduleController implements Initializable {
                     MaintenanceSchedule ms = getTableView().getItems().get(getIndex());
                     handleComplete(ms);
                 });
-
+                btnDelete.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
+                btnComplete.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
                 box.setAlignment(Pos.CENTER);
             }
 
@@ -542,5 +546,53 @@ public class MaintenanceScheduleController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+  
+    public static void showUpcomingMaintenance(List<MaintenanceSchedule> schedules, int daysAhead) {
+        List<MaintenanceSchedule> upcoming = getUpcomingSchedules(schedules, daysAhead);
+
+        if (upcoming.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Thông báo bảo trì");
+            alert.setHeaderText("Không có lịch bảo trì sắp tới");
+            alert.setContentText("Chưa có thiết bị nào cần bảo trì trong " + daysAhead + " ngày tới.");
+            alert.show();
+            return;
+        }
+
+        StringBuilder content = new StringBuilder();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        for (MaintenanceSchedule s : upcoming) {
+            content.append("Thiết bị: ").append(s.getDeviceName())
+                    .append("\nNgười thực hiện: ").append(s.getExecutorName())
+                    .append("\nNgày bảo trì: ").append(s.getLastMaintenanceDate())
+                    .append(" lúc ").append(s.getScheduledTime())
+                    .append("\n-------------------------------------\n");
+        }
+
+        TextArea textArea = new TextArea(content.toString());
+        textArea.setWrapText(true);
+        textArea.setEditable(false);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Thông báo bảo trì định kỳ");
+        alert.setHeaderText("Có " + upcoming.size() + " thiết bị cần bảo trì trong " + daysAhead + " ngày tới");
+        alert.getDialogPane().setContent(textArea);
+        alert.show();
+    }
+
+    public static List<MaintenanceSchedule> getUpcomingSchedules(List<MaintenanceSchedule> schedules, int daysAhead) {
+        LocalDate today = LocalDate.now();
+        LocalDate targetDate = today.plusDays(daysAhead);
+
+        return schedules.stream()
+                .filter(s -> s.getScheduledDate() != null
+                && !s.getScheduledDate().isBefore(today)
+                && !s.getScheduledDate().isAfter(targetDate))
+                .sorted(Comparator.comparing(MaintenanceSchedule::getScheduledDate))
+                .collect(Collectors.toList());
     }
 }

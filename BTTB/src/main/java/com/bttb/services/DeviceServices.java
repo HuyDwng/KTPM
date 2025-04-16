@@ -45,6 +45,7 @@ public class DeviceServices {
         }
     }
 
+
     public List<Device> getAllDevicesForSearch() {
         List<Device> devices = new ArrayList<>();
         String query = "SELECT d.id, d.name, d.status, dt.name as deviceTypeName "
@@ -200,4 +201,5 @@ public class DeviceServices {
             return false;
         }
     }
+
 }

@@ -12,6 +12,13 @@ import java.time.LocalDateTime;
  */
 public class User {
 
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
     private int id;
     private String name;
     private String email;
@@ -115,10 +122,6 @@ public class User {
      */
     public void setRole(String role) {
         this.role = role;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {

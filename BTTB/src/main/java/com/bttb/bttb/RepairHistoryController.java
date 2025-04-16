@@ -7,6 +7,7 @@ import com.bttb.pojo.RepairIssue;
 import com.bttb.pojo.User;
 import com.bttb.services.DeviceServices;
 import com.bttb.services.RepairHistoryServices;
+import com.bttb.services.RepairIssueServices;
 import com.bttb.services.UserServices;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -19,7 +20,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -77,16 +77,15 @@ public class RepairHistoryController implements Initializable {
     @FXML
     private TableColumn<RepairIssue, Double> costColumn;
 
-// Các cột khác
-    // Ngày hoàn thành
     private final RepairHistoryServices repairHistoryService = new RepairHistoryServices();
     private final UserServices userServices = new UserServices();
     private final DeviceServices deviceServices = new DeviceServices();
+    private final RepairIssueServices repairIssueServices = new RepairIssueServices();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         tableIssueList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        System.out.println(tableIssueList);
+        
         setupTableColumns();
         loadRepairHistoryData();
         loadTechnicians();
@@ -124,41 +123,19 @@ public class RepairHistoryController implements Initializable {
 
         // Truy vấn lại Device từ ID
         Device selectedDevice = deviceServices.getDeviceById(deviceId);
-        System.out.println(selectedDevice);
+        
         if (selectedDevice != null) {
 
             loadRepairIssuesForDevice(String.valueOf(deviceId));
-            System.out.println(String.valueOf(deviceId));// hoặc truyền int nếu hàm hỗ trợ
+            
         }
     }
 
     private void loadRepairIssuesForDevice(String deviceId) {
-        System.out.println("Loading repair issues for deviceId = " + deviceId);
-        ObservableList<RepairIssue> issues = FXCollections.observableArrayList();
-
-        String sql = "SELECT ri.id, ri.name, ri.cost, ri.device_type_id FROM device d "
-                + "JOIN repair_issue ri ON d.device_type_id = ri.device_type_id "
-                + "WHERE d.id = ?";
-
-        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(sql)) {
-            stm.setString(1, deviceId);
-            ResultSet rs = stm.executeQuery();
-
-            while (rs.next()) {
-                RepairIssue issue = new RepairIssue(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getInt("device_type_id"),
-                        rs.getDouble("cost")
-                );
-                issues.add(issue);
-            }
-
-            System.out.println("Issues loaded: " + issues.size());
-            tableIssueList.setItems(issues);
-
+        try {
+            List<RepairIssue> issueList = repairIssueServices.getRepairIssuesByDeviceId(deviceId);
+            tableIssueList.setItems(FXCollections.observableArrayList(issueList));
         } catch (SQLException e) {
-            e.printStackTrace();
             showError("Lỗi khi tải danh sách lỗi: " + e.getMessage());
         }
     }
@@ -184,9 +161,7 @@ public class RepairHistoryController implements Initializable {
 
     private void setupTableColumns() {
         colDeviceName.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
-        System.out.println(colDeviceName);
         colTechnician.setCellValueFactory(new PropertyValueFactory<>("technicianName"));
-        System.out.println(colTechnician);
         colRepairIssue.setCellValueFactory(cellData -> {
             List<String> repairIssues = cellData.getValue().getRepairIssue();
             // Chuyển danh sách thành chuỗi, phân tách bằng dấu phẩy
@@ -336,7 +311,7 @@ public class RepairHistoryController implements Initializable {
         }
 
         String deviceName = selectedDevice.getName();
-        System.out.println(deviceName);
+        
         LocalDate repairDate;
         repairDate = datePicker.getValue();
         if (technicianId == -1 || repairDate == null || selectedTime == null) {
@@ -377,7 +352,7 @@ public class RepairHistoryController implements Initializable {
         );
         newRepair.setTechnicianName(technicianName);
         newRepair.setDeviceName(deviceName);
-        System.out.println(">>> Device Name Set: " + newRepair.getDeviceName());
+        
 
         // Gọi service để lưu
         try {

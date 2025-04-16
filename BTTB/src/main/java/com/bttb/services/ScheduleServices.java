@@ -96,6 +96,7 @@ public class ScheduleServices {
         try (Connection conn = JdbcUtils.getConn()) {
             String sql = "SELECT ms.id, d.name AS device_name, u.name AS executor_name, "
                     + "ms.scheduled_date, ms.scheduled_time, ms.frequency, "
+                    //+ "ms.next_maintenance_date, ms.created_at, ms.completed_date "
                     + "ms.maintenance_period, ms.created_at, ms.last_maintenance_date "
                     + "FROM maintenance_schedule ms "
                     + "JOIN device d ON ms.device_id = d.id "
@@ -135,6 +136,39 @@ public class ScheduleServices {
         }
     }
 
+    public boolean completeSchedule(int scheduleId, LocalDate completedDate, String frequency) {
+        String sql = "UPDATE maintenance_schedule SET completed_date = ?, next_maintenance_date = ? WHERE id = ?";
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setDate(1, Date.valueOf(completedDate));
+
+            // Tính ngày tiếp theo dựa vào frequency
+            LocalDate nextDate;
+            switch (frequency.toLowerCase()) {
+                case "hàng tuần":
+                    nextDate = completedDate.plusWeeks(1);
+                    break;
+                case "hàng tháng":
+                    nextDate = completedDate.plusMonths(1);
+                    break;
+                
+                default:
+                    nextDate = null;
+            }
+
+            if (nextDate != null) {
+                stm.setDate(2, Date.valueOf(nextDate));
+            } else {
+                stm.setNull(2, java.sql.Types.DATE);
+            }
+
+            stm.setInt(3, scheduleId);
+
+            return stm.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Lỗi cập nhật completed_date: " + e.getMessage());
+            return false;
+        }
+    }
     public boolean markAsCompleted(int scheduleId, LocalDate completedDate) throws SQLException {
         String sql = "UPDATE maintenance_schedule SET last_maintenance_date = ? WHERE id = ?";
         try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(sql)) {
