@@ -31,7 +31,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 public class MaintenanceScheduleController implements Initializable {
@@ -41,8 +40,6 @@ public class MaintenanceScheduleController implements Initializable {
     @FXML
     private Tab tabManagement;
 //    Lập lịch
-    @FXML
-    private VBox rootVBox;
     @FXML
     private ComboBox<Device> comboBoxDevices;
     @FXML
@@ -115,8 +112,7 @@ public class MaintenanceScheduleController implements Initializable {
                 Logger.getLogger(MaintenanceScheduleController.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-
-        Platform.runLater(() -> rootVBox.requestFocus());
+        
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab == tabManagement) {
                 lblMessage.setVisible(false);
