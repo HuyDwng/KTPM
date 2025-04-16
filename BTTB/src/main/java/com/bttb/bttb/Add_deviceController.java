@@ -3,7 +3,7 @@ package com.bttb.bttb;
 import com.bttb.pojo.Device;
 import com.bttb.pojo.DeviceType;
 import com.bttb.services.DeviceServices;
-import com.bttb.services.DeviceTypeService;
+import com.bttb.services.DeviceTypeServices;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -22,11 +22,11 @@ public class Add_deviceController {
     private ComboBox<DeviceType> typeComboBox;
 
     private DeviceServices deviceService;
-    private DeviceTypeService deviceTypeService;
+    private DeviceTypeServices deviceTypeServices;
 
     public void setDeviceManagementController(Device_managementController controller) {
         this.deviceService = new DeviceServices(controller);
-        this.deviceTypeService = new DeviceTypeService();
+        this.deviceTypeServices = new DeviceTypeServices();
     }
 
     public void addDevice() {
@@ -64,12 +64,12 @@ public class Add_deviceController {
     public void initialize() {
         // Danh sách trạng thái thiết bị
         ObservableList<String> statusList = FXCollections.observableArrayList("Đang hoạt động", "Hỏng hóc", "Đang sửa");
-        this.deviceTypeService = new DeviceTypeService();
+        this.deviceTypeServices = new DeviceTypeServices();
         statusComboBox.setItems(statusList);
 
         statusComboBox.setValue("Đang hoạt động");
         
-        ObservableList<DeviceType> typeList = FXCollections.observableArrayList(deviceTypeService.getAllDeviceTypes());
+        ObservableList<DeviceType> typeList = FXCollections.observableArrayList(deviceTypeServices.getAllDeviceTypes());
         typeComboBox.setItems(typeList);
     }
 }
