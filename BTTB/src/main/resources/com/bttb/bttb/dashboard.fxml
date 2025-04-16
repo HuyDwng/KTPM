@@ -13,28 +13,42 @@
     <left>
         <VBox prefHeight="430.0" prefWidth="124.0" spacing="10.0" style="-fx-background-color: #2C3E50;">
             <Button fx:id="btnDevice" maxWidth="Infinity" onAction="#openDeviceManagement" text="Quản lý Thiết bị">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" top="10.0" />
-            </VBox.margin>
-            <opaqueInsets>
-               <Insets />
-            </opaqueInsets></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" top="10.0" />
+                </VBox.margin>
+                <opaqueInsets>
+                    <Insets />
+                </opaqueInsets>
+            </Button>
             <Button fx:id="btnSchedule" maxWidth="Infinity" onAction="#openMaintenanceSchedule" text="Lịch bảo trì">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
             <Button fx:id="btnRepairHistory" maxWidth="Infinity" onAction="#openRepairHistory" text="Lịch sử sửa chữa">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
             <Button fx:id="btnAddTechnician" maxWidth="Infinity" onAction="#openAddTechnician" text="Thêm kỹ thuật viên">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
+            <Button fx:id="btnMaintenanceAlert"
+                    text="Bảo trì (0)"
+                    maxWidth="Infinity"
+                    onAction="#showUpcomingMaintenanceInfo"
+                    style="-fx-background-color: orange; -fx-text-fill: white;" >
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
             <Button fx:id="btnLogout" maxWidth="Infinity" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="Đăng xuất">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
         </VBox>
     </left>
     <top>
