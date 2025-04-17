@@ -9,32 +9,42 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="mainPane" prefHeight="522.0" prefWidth="1123.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.DashboardController">
+<BorderPane fx:id="mainPane" prefHeight="520.0" prefWidth="1123.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.DashboardController">
     <left>
-        <VBox prefHeight="430.0" prefWidth="124.0" spacing="10.0" style="-fx-background-color: #2C3E50;">
+        <VBox prefHeight="425.0" prefWidth="139.0" spacing="10.0" style="-fx-background-color: #2C3E50;">
             <Button fx:id="btnDevice" maxWidth="Infinity" onAction="#openDeviceManagement" text="Quản lý Thiết bị">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" top="10.0" />
-            </VBox.margin>
-            <opaqueInsets>
-               <Insets />
-            </opaqueInsets></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" top="10.0" />
+                </VBox.margin>
+                <opaqueInsets>
+                    <Insets />
+                </opaqueInsets>
+            </Button>
             <Button fx:id="btnSchedule" maxWidth="Infinity" onAction="#openMaintenanceSchedule" text="Lịch bảo trì">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
             <Button fx:id="btnRepairHistory" maxWidth="Infinity" onAction="#openRepairHistory" text="Lịch sử sửa chữa">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></Button>
-            <Button fx:id="btnAddTechnician" maxWidth="Infinity" onAction="#openAddTechnician" text="Thêm kỹ thuật viên">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
+            <Button fx:id="btnAddTechnician" maxWidth="Infinity" onAction="#openAddTechnician" prefHeight="26.0" prefWidth="93.0" text="Thêm kỹ thuật viên">
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
+            <Button fx:id="btnMaintenanceAlert" maxWidth="Infinity" onAction="#showUpcomingMaintenanceInfo" style="-fx-background-color: orange; -fx-text-fill: white;" text="Bảo trì (0)">
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
             <Button fx:id="btnLogout" maxWidth="Infinity" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="Đăng xuất">
-            <VBox.margin>
-               <Insets left="10.0" right="10.0" />
-            </VBox.margin></Button>
+                <VBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </VBox.margin>
+            </Button>
         </VBox>
     </left>
     <top>
@@ -49,6 +59,6 @@
         </HBox>
     </top>
     <center>
-        <StackPane fx:id="contentPane" />
+        <StackPane fx:id="contentPane" prefHeight="410.0" prefWidth="999.0" />
     </center>
 </BorderPane>

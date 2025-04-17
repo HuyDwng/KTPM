@@ -18,9 +18,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-
         scene = new Scene(loadFXML("repair_history"));
-
         stage.setScene(scene);
         stage.sizeToScene(); //update size theo fxml
         stage.setResizable(false);

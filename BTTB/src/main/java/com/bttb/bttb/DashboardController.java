@@ -4,21 +4,14 @@
  */
 package com.bttb.bttb;
 
-//import com.bttb.pojo.MaintenanceSchedule;
-//import com.bttb.services.ScheduleServices;
-//import java.net.URL;
-//import java.sql.SQLException;
-//import java.util.ResourceBundle;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
-//import javafx.collections.ObservableList;
-//import javafx.fxml.Initializable;
 import com.bttb.pojo.MaintenanceSchedule;
 import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +20,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -50,6 +45,13 @@ public class DashboardController implements Initializable {
     @FXML
     private Button btnDevice, btnSchedule, btnRepairHistory, btnLogout, btnAddTechnician;
 
+    @FXML
+    private Button btnMaintenanceAlert;
+
+    private List<MaintenanceSchedule> upcomingSchedules = new ArrayList<>();
+
+    private ScheduleServices ss = new ScheduleServices();
+
     private void loadView(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
@@ -58,12 +60,9 @@ public class DashboardController implements Initializable {
             contentPane.getChildren().clear();
             contentPane.getChildren().add(view);
 
-            if (view instanceof AnchorPane) {
-                AnchorPane.setTopAnchor(view, 0.0);
-                AnchorPane.setBottomAnchor(view, 0.0);
-                AnchorPane.setLeftAnchor(view, 0.0);
-                AnchorPane.setRightAnchor(view, 0.0);
-            }
+            // Căn giữa view trong StackPane
+            StackPane.setAlignment(view, Pos.CENTER);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -89,29 +88,44 @@ public class DashboardController implements Initializable {
         loadView("/com/bttb/bttb/add_technician.fxml");
     }
 
-//    @FXML
-//    private void initialize() {
-//        // Optionally load default view
-//        openDeviceManagement(null);
-//    }
     @FXML
     private void btnLogout(ActionEvent event) {
         // TODO: Xử lý đăng xuất ở đây nếu cần
         System.out.println("Đăng xuất");
     }
 
+    @FXML
+    private void showUpcomingMaintenanceInfo(ActionEvent event) {
+        if (upcomingSchedules.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Thông báo bảo trì");
+            alert.setHeaderText("Không có thiết bị cần bảo trì");
+            alert.setContentText("Chưa có thiết bị nào cần bảo trì trong 10 ngày tới.");
+            alert.show();
+        } else {
+            MaintenanceScheduleController.showUpcomingMaintenance(upcomingSchedules, 10);
+        }
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
         ScheduleServices ss = new ScheduleServices();
         try {
             ObservableList<MaintenanceSchedule> schedules = ss.getAllSchedules();
             if (schedules != null && !schedules.isEmpty()) {
-                MaintenanceScheduleController.showUpcomingMaintenance(schedules, 3);
+                upcomingSchedules = MaintenanceScheduleController.getUpcomingSchedules(schedules, 10);
+
+                if (!upcomingSchedules.isEmpty()) {
+                    btnMaintenanceAlert.setText("Bảo trì (" + upcomingSchedules.size() + ")");
+                } else {
+                    btnMaintenanceAlert.setText("Bảo trì (0)");
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        openDeviceManagement(null);
     }
 
    
