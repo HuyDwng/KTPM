@@ -5,6 +5,7 @@
 package com.bttb.bttb;
 
 import com.bttb.pojo.MaintenanceSchedule;
+import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.io.IOException;
 import java.net.URL;
@@ -108,6 +109,7 @@ public class DashboardController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        ScheduleServices ss = new ScheduleServices();
         try {
             ObservableList<MaintenanceSchedule> schedules = ss.getAllSchedules();
             if (schedules != null && !schedules.isEmpty()) {
@@ -125,4 +127,7 @@ public class DashboardController implements Initializable {
 
         openDeviceManagement(null);
     }
+
+   
+
 }

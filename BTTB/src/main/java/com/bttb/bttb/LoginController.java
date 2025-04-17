@@ -16,7 +16,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import org.mindrot.jbcrypt.BCrypt;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 
 public class LoginController implements Initializable {
 
@@ -59,8 +60,7 @@ public class LoginController implements Initializable {
         String role = roleComboBox.getValue();
 
         if (username.isEmpty() || password.isEmpty() || role == null) {
-            errorLabel.setText("Vui lòng điền đầy đủ thông tin!");
-            errorLabel.setVisible(true);
+            showErrorWithTimeout("Vui lòng điền đầy đủ thông tin!");
             return;
         }
 
@@ -69,21 +69,38 @@ public class LoginController implements Initializable {
 
             if (user != null && HashUtils.checkPassword(password, user.getPassword())) {
                 // Đăng nhập thành công
-                Utils.loadView((Stage) loginButton.getScene().getWindow(), "/com/bttb/bttb/dashboard.fxml");
+
+                User.currentUser = user; // 
+                System.out.println(user.getRole());
+                if ("technician".equals(user.getRole())) {
+                    showErrorWithTimeout("Kỹ thuật viên chưa được hỗ trợ!");
+                } else {
+                    Utils.loadView((Stage) loginButton.getScene().getWindow(), "/com/bttb/bttb/dashboard.fxml");
+                }
+
             } else {
                 // Sai username/password
                 errorLabel.setText("Sai thông tin đăng nhập!");
                 errorLabel.setVisible(true);
             }
         } catch (SQLException e) {
-            errorLabel.setText("Lỗi kết nối cơ sở dữ liệu.");
-            errorLabel.setVisible(true);
+            showErrorWithTimeout("Lỗi kết nối cơ sở dữ liệu.");
+
             e.printStackTrace();
         } catch (Exception e) {
-            errorLabel.setText("Có lỗi xảy ra!");
-            errorLabel.setVisible(true);
+            showErrorWithTimeout("Có lỗi xảy ra!");
+            
             e.printStackTrace();
         }
+    }
+
+    private void showErrorWithTimeout(String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(5));
+        pause.setOnFinished(event -> errorLabel.setVisible(false));
+        pause.play();
     }
 
 }
