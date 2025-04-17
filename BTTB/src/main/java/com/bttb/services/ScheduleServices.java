@@ -42,7 +42,7 @@ public class ScheduleServices {
     public static ObservableList<User> loadExecutors() {
         ObservableList<User> executors = FXCollections.observableArrayList();
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT id, name FROM user WHERE role = 'technician'";
+            String sql = "SELECT id, name FROM \"user\" WHERE role = 'technician'";
             PreparedStatement stm = conn.prepareCall(sql);
             ResultSet rs = stm.executeQuery();
 
@@ -74,7 +74,7 @@ public class ScheduleServices {
     public static String getExecutorEmail(int executorId) {
         String email = null;
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT email FROM user WHERE id = ?";
+            String sql = "SELECT email FROM \"user\" WHERE id = ?";
             PreparedStatement stm = conn.prepareStatement(sql);
             stm.setInt(1, executorId);
             ResultSet rs = stm.executeQuery();
@@ -100,7 +100,7 @@ public class ScheduleServices {
                     + "ms.maintenance_period, ms.created_at, ms.last_maintenance_date "
                     + "FROM maintenance_schedule ms "
                     + "JOIN device d ON ms.device_id = d.id "
-                    + "JOIN user u ON ms.executor_id = u.id "
+                    + "JOIN \"user\" u ON ms.executor_id = u.id "
                     + "ORDER BY ms.id DESC";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -177,5 +177,4 @@ public class ScheduleServices {
             return stm.executeUpdate() > 0;
         }
     }
-
 }
