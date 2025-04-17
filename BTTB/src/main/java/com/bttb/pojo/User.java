@@ -26,6 +26,7 @@ public class User {
     private String password;
     private String role;
     private LocalDateTime createdTime;
+    public static User currentUser;
 
     public User(int id, String name, String email, String username, String password, String role) {
         this.id = id;

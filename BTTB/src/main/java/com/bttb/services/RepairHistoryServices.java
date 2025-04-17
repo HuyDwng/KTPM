@@ -137,69 +137,23 @@ public class RepairHistoryServices {
         return issues;
     }
 
-}
+    public boolean isTechnicianBusy(int technicianId) {
+        String sql = "SELECT COUNT(*) FROM repair_history WHERE technician_id = ? AND status = 'Đang sửa'";
 
-//    public List<RepairHistory> searchRepairHistory(String technician, String deviceId, LocalDateTime startDate, LocalDateTime endDate) throws SQLException {
-//        // Kiểm tra nếu tất cả các tham số đều trống hoặc null, thì không thực hiện gì cả
-//      
-//
-//        // Xây dựng truy vấn SQL với các điều kiện động
-//        StringBuilder sql = new StringBuilder("SELECT * FROM repair_history WHERE 1=1");
-//
-//        if (technician != null && !technician.isEmpty()) {
-//            sql.append(" AND technician = ?");
-//        }
-//        if (deviceId != null && !deviceId.isEmpty()) {
-//            sql.append(" AND device_id = ?");
-//        }
-//        if (startDate != null) {
-//            sql.append(" AND repair_date >= ?");
-//        }
-//        if (endDate != null) {
-//            sql.append(" AND completion_date <= ?");
-//        }
-//        
-//        try (Connection conn = JdbcUtils.getConn()) {
-//            PreparedStatement stm = conn.prepareStatement(sql.toString());
-//            int index = 1;
-//
-//            if (technician != null && !technician.isEmpty()) {
-//                stm.setString(index++, technician);
-//            }
-//            if (deviceId != null && !deviceId.isEmpty()) {
-//                stm.setString(index++, deviceId);
-//            }
-//            if (startDate != null) {
-//                stm.setTimestamp(index++, Timestamp.valueOf(startDate));
-//            }
-//            if (endDate != null) {
-//                stm.setTimestamp(index++, Timestamp.valueOf(endDate));
-//            }
-//
-//            System.out.println("Executing query: " + sql.toString());  // Kiểm tra câu truy vấn
-//
-//            ResultSet rs = stm.executeQuery();
-//            List<RepairHistory> repairHistories = new ArrayList<>();
-//
-//            while (rs.next()) {
-//                RepairHistory repairHistory = new RepairHistory(
-//                        rs.getInt("id"),
-//                        rs.getInt("device_id"),
-//                        rs.getString("technician"),
-//                        rs.getTimestamp("repair_date").toLocalDateTime(),
-//                        rs.getTimestamp("completion_date") != null ? rs.getTimestamp("completion_date").toLocalDateTime() : null,
-//                        rs.getString("status"),
-//                        rs.getDouble("cost")
-//                );
-//                repairHistories.add(repairHistory);
-//            }
-//
-//            if (repairHistories.isEmpty()) {
-//                System.out.println("No results found.");
-//            }
-//
-//            return repairHistories;
-//        }
-//    }
-//
-//}
+        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stm = conn.prepareStatement(sql)) {
+
+            stm.setInt(1, technicianId);
+            ResultSet rs = stm.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+                return true; // Đang bận
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Lỗi kiểm tra kỹ thuật viên bận: " + e.getMessage());
+        }
+
+        return false; // Không bận
+    }
+
+}
