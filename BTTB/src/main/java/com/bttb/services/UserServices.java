@@ -71,7 +71,7 @@ public class UserServices {
             stm.setString(2, u.getEmail());
             stm.setString(3, u.getUsername());
             String hashedPassword = HashUtils.hashPassword(u.getPassword());
-            stm.setString(4, hashedPassword); // sau này có thể hash ở đây
+            stm.setString(4, hashedPassword);
             stm.setString(5, u.getRole());
 
             return stm.executeUpdate() > 0;
