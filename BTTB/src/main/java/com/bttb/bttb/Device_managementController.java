@@ -5,13 +5,9 @@
 package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
-import com.bttb.pojo.JdbcUtils;
 import com.bttb.services.DeviceServices;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -47,7 +43,7 @@ public class Device_managementController implements Initializable {
     @FXML
     private ComboBox<String> statusFilter;
     @FXML
-    private TableView<Device> deviceTable;
+    public TableView<Device> deviceTable;
     @FXML
     private TableColumn<Device, Integer> colDeviceId;
     @FXML
@@ -219,8 +215,8 @@ public class Device_managementController implements Initializable {
     @FXML
     private TextField searchField;  // Trường tìm kiếm
 
-    private ObservableList<Device> allDeviceList = FXCollections.observableArrayList();
-    private ObservableList<Device> filteredDeviceList = FXCollections.observableArrayList();
+    public ObservableList<Device> allDeviceList = FXCollections.observableArrayList();
+    public ObservableList<Device> filteredDeviceList = FXCollections.observableArrayList();
 
 // Phương thức xử lý thay đổi trường tìm kiếm
     @FXML
@@ -233,7 +229,7 @@ public class Device_managementController implements Initializable {
     }
 
 // Phương thức lọc thiết bị
-    private void filterDevices(String searchText, String selectedStatus) {
+    public void filterDevices(String searchText, String selectedStatus) {
         filteredDeviceList.clear();
 
         for (Device device : allDeviceList) {
@@ -248,29 +244,6 @@ public class Device_managementController implements Initializable {
         deviceTable.setItems(filteredDeviceList);  // Cập nhật bảng với danh sách đã lọc
     }
 
-//    @FXML
-//    private void loadDeviceDataSearch() {
-//        allDeviceList.clear();
-//
-//        String query = "SELECT * FROM device";
-//
-//        try (Connection conn = JdbcUtils.getConn(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
-//
-//            while (rs.next()) {
-//                int id = rs.getInt("id");
-//                String name = rs.getString("name");
-//                String status = rs.getString("status");
-//                int type = rs.getInt("device_type_id");
-//
-//                allDeviceList.add(new Device(id, name, status, type));
-//            }
-//
-//            filterDevices(searchField.getText().toLowerCase(), statusFilter.getValue());
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
     @FXML
     private void loadDeviceDataSearch() {
         allDeviceList.clear();
