@@ -18,6 +18,8 @@
             </goals>
             <properties>
                 <jpda.listen>true</jpda.listen>
+                <property name="run.jvmargs" value="-Dtest.mode=true"/>
+
             </properties>
         </action>
         <action>
