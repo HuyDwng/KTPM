@@ -55,7 +55,7 @@ public class Update_statusController {
             return;
         }
 
-        if ("Đã thanh lý".equals(selectedDevice.getStatus())) {
+        if ("Đã Thanh Lý".equals(selectedDevice.getStatus())) {
             showAlert(Alert.AlertType.WARNING, "Cảnh báo", "Thiết bị này đã thanh lý và không thể cập nhật trạng thái!");
             return;
         }
@@ -100,7 +100,7 @@ public class Update_statusController {
 
     @FXML
     public void initialize() {
-        cbStatus.setItems(FXCollections.observableArrayList("Đang hoạt động", "Đang sửa", "Hỏng hóc", "Đã thanh lý"));
+        cbStatus.setItems(FXCollections.observableArrayList("Đang hoạt động", "Đang sửa", "Hỏng hóc", "Đã Thanh Lý"));
         cbDevice.setOnAction(event -> {
             if (cbDevice.getValue() != null) {
                 cbStatus.setValue(cbDevice.getValue().getStatus());

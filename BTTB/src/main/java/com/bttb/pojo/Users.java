@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  *
  * @author 84353
  */
-public class User {
+public class Users {
 
     /**
      * @return the password
@@ -26,9 +26,9 @@ public class User {
     private String password;
     private String role;
     private LocalDateTime createdTime;
-    public static User currentUser;
+    public static Users currentUser;
 
-    public User(int id, String name, String email, String username, String password, String role) {
+    public Users(int id, String name, String email, String username, String password, String role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -37,7 +37,7 @@ public class User {
         this.role = role;
     }
 
-    public User(String name, String email, String username, String password, String role) {
+    public Users(String name, String email, String username, String password, String role) {
         this.name = name;
         this.email = email;
         this.username = username;
@@ -45,9 +45,12 @@ public class User {
         this.role = role;
     }
 
-    public User(int id, String name) {
+    public Users(int id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public Users() {
     }
 
     @Override

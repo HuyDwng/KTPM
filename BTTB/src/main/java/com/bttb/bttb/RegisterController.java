@@ -4,8 +4,8 @@
  */
 package com.bttb.bttb;
 
-import com.bttb.pojo.User;
-import com.bttb.services.UserServices;
+import com.bttb.pojo.Users;
+import com.bttb.services.UsersServices;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -35,7 +35,7 @@ public class RegisterController implements Initializable {
     @FXML
     private Label lblMessage;
 
-    private final UserServices userServices = new UserServices();
+    private final UsersServices usersServices = new UsersServices();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -93,8 +93,8 @@ public class RegisterController implements Initializable {
         }
 
         try {
-            User newUser = new User(name, email, username, password, "technician");
-            boolean success = userServices.addUser(newUser);
+            Users newUser = new Users(name, email, username, password, "technician");
+            boolean success = usersServices.addUser(newUser);
 
             if (success) {
                 lblMessage.setText("Đăng ký thành công!");

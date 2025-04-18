@@ -3,7 +3,7 @@ package com.bttb.services;
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
 import com.bttb.pojo.MaintenanceSchedule;
-import com.bttb.pojo.User;
+import com.bttb.pojo.Users;
 import javafx.collections.ObservableList;
 import org.junit.jupiter.api.*;
 
@@ -25,7 +25,7 @@ public class ScheduleServicesTest {
         scheduleServices = new ScheduleServices();
 
         try (Connection conn = JdbcUtils.getConn(); Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE \"user\" ("
+            stmt.execute("CREATE TABLE users ("
                     + "id INT PRIMARY KEY,"
                     + "name VARCHAR(100),"
                     + "email VARCHAR(100),"
@@ -48,14 +48,13 @@ public class ScheduleServicesTest {
                     + "completed_date DATE,"
                     + "last_maintenance_date DATE,"
                     + "next_maintenance_date DATE,"
-                    + "FOREIGN KEY (executor_id) REFERENCES \"user\"(id),"
+                    + "FOREIGN KEY (executor_id) REFERENCES users(id),"
                     + "FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE)");
 
-            stmt.execute("INSERT INTO \"user\" (id, name, email, role) VALUES (100, 'KTV A', 'ktva@gmail.com', 'technician')");
+            stmt.execute("INSERT INTO users (id, name, email, role) VALUES (100, 'KTV A', 'ktva@gmail.com', 'technician')");
             stmt.execute("INSERT INTO device (id, name, status) VALUES (1, 'Thiết bị A', 'Đang hoạt động')");
             stmt.execute("INSERT INTO device (id, name, status) VALUES (2, 'Thiết bị B', 'Không hoạt động')");
 
-            // Ensure maintenance_period is a date
             stmt.execute("INSERT INTO maintenance_schedule (device_id, scheduled_date, scheduled_time, frequency, executor_id, maintenance_period) "
                     + "VALUES (1, '2025-04-17', '10:00:00', 'hàng tuần', 100, '2025-04-24')");
         }
@@ -64,13 +63,11 @@ public class ScheduleServicesTest {
     @BeforeEach
     public void setup() throws SQLException {
         try (Connection conn = JdbcUtils.getConn(); Statement stmt = conn.createStatement()) {
-            // Xóa dữ liệu theo thứ tự tránh vi phạm ràng buộc khóa ngoại
             stmt.executeUpdate("DELETE FROM maintenance_schedule");
             stmt.executeUpdate("DELETE FROM device");
-            stmt.executeUpdate("DELETE FROM \"user\"");
+            stmt.executeUpdate("DELETE FROM users");
 
-            // Chèn lại dữ liệu mẫu
-            stmt.executeUpdate("INSERT INTO \"user\" (id, name, email, role) VALUES (100, 'KTV A', 'ktva@gmail.com', 'technician')");
+            stmt.executeUpdate("INSERT INTO users (id, name, email, role) VALUES (100, 'KTV A', 'ktva@gmail.com', 'technician')");
             stmt.executeUpdate("INSERT INTO device (id, name, status) VALUES (1, 'Thiết bị A', 'Đang hoạt động')");
             stmt.executeUpdate("INSERT INTO device (id, name, status) VALUES (2, 'Thiết bị B', 'Không hoạt động')");
 
@@ -111,7 +108,7 @@ public class ScheduleServicesTest {
 
     @Test
     public void testLoadExecutors() {
-        ObservableList<User> executors = ScheduleServices.loadExecutors();
+        ObservableList<Users> executors = ScheduleServices.loadExecutors();
         assertEquals(1, executors.size());
         assertEquals("KTV A", executors.get(0).getName());
     }
