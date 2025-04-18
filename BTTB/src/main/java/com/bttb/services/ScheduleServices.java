@@ -3,7 +3,7 @@ package com.bttb.services;
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
 import com.bttb.pojo.MaintenanceSchedule;
-import com.bttb.pojo.User;
+import com.bttb.pojo.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,15 +39,15 @@ public class ScheduleServices {
     }
 
     // Phương thức load danh sách người thực hiện là kỹ thuật viên từ cơ sở dữ liệu
-    public static ObservableList<User> loadExecutors() {
-        ObservableList<User> executors = FXCollections.observableArrayList();
+    public static ObservableList<Users> loadExecutors() {
+        ObservableList<Users> executors = FXCollections.observableArrayList();
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT id, name FROM \"user\" WHERE role = 'technician'";
+            String sql = "SELECT id, name FROM users WHERE role = 'technician'";
             PreparedStatement stm = conn.prepareCall(sql);
             ResultSet rs = stm.executeQuery();
 
             while (rs.next()) {
-                executors.add(new User(rs.getInt("id"), rs.getString("name")));
+                executors.add(new Users(rs.getInt("id"), rs.getString("name")));
             }
 
         } catch (SQLException e) {
@@ -74,7 +74,7 @@ public class ScheduleServices {
     public static String getExecutorEmail(int executorId) {
         String email = null;
         try (Connection conn = JdbcUtils.getConn()) {
-            String sql = "SELECT email FROM \"user\" WHERE id = ?";
+            String sql = "SELECT email FROM users WHERE id = ?";
             PreparedStatement stm = conn.prepareStatement(sql);
             stm.setInt(1, executorId);
             ResultSet rs = stm.executeQuery();
@@ -100,7 +100,7 @@ public class ScheduleServices {
                     + "ms.maintenance_period, ms.created_at, ms.last_maintenance_date "
                     + "FROM maintenance_schedule ms "
                     + "JOIN device d ON ms.device_id = d.id "
-                    + "JOIN \"user\" u ON ms.executor_id = u.id "
+                    + "JOIN users u ON ms.executor_id = u.id "
                     + "ORDER BY ms.id DESC";
 
             PreparedStatement stmt = conn.prepareStatement(sql);

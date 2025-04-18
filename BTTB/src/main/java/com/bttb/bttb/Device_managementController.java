@@ -281,7 +281,7 @@ public class Device_managementController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ObservableList<String> statusOptions = FXCollections.observableArrayList(
-                "Tất cả", "Đang hoạt động", "Hỏng hóc", "Đang sửa", "Đã thanh lý"
+                "Tất cả", "Đang hoạt động", "Hỏng hóc", "Đang sửa", "Đã Thanh Lý"
         );
         statusFilter.setItems(statusOptions);
 

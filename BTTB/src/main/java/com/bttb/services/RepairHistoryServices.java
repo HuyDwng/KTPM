@@ -28,7 +28,7 @@ public class RepairHistoryServices {
                     + "rh.repair_date, rh.completion_date, rh.status, rh.cost, rh.device_type_id, "
                     + "ri.name AS repair_issue_name, ri.cost AS repair_issue_price "
                     + "FROM repair_history rh "
-                    + "LEFT JOIN user u ON rh.technician_id = u.id "
+                    + "LEFT JOIN users u ON rh.technician_id = u.id "
                     + "LEFT JOIN repair_history_repair_issue rhr ON rh.id = rhr.repair_history_id "
                     + "LEFT JOIN repair_issue ri ON rhr.repair_issue_id = ri.id";
 
