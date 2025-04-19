@@ -24,6 +24,6 @@ public class JdbcUtils {
         }
 
         // 🔹 Kết nối MySQL khi chạy thật
-        return DriverManager.getConnection("jdbc:mysql://localhost/bttbdb", "root", "Admin@123");
+        return DriverManager.getConnection("jdbc:mysql://localhost/bttbdb", "root", "huyduong2004");
     }
 }
