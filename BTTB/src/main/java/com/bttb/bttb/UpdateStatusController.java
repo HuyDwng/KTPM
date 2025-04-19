@@ -1,4 +1,4 @@
-package com.bttb.controller;
+package com.bttb.bttb;
 
 import com.bttb.pojo.Device;
 import com.bttb.services.DeviceServices;

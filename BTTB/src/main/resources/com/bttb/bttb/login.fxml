@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane style="-fx-background-color: linear-gradient(to bottom, #e0eafc, #cfdef3);" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.bttb.controller.LoginController">
+<AnchorPane style="-fx-background-color: linear-gradient(to bottom, #e0eafc, #cfdef3);" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.bttb.bttb.LoginController">
     <children>
         <VBox alignment="CENTER" prefHeight="400.0" prefWidth="500.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 30;">
             <effect>

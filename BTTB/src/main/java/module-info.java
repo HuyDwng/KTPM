@@ -6,8 +6,8 @@ module com.bttb.bttb {
     requires jakarta.mail;
     
     opens com.bttb.pojo to javafx.base;
-    opens com.bttb.controller to javafx.fxml;
-    exports com.bttb.controller;
+    opens com.bttb.bttb to javafx.fxml;
+    exports com.bttb.bttb;
     exports com.bttb.services;
     exports com.bttb.pojo;
 //    requires jbcrypt;
