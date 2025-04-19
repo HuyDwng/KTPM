@@ -1,4 +1,4 @@
-package com.bttb.controller;
+package com.bttb.bttb;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
