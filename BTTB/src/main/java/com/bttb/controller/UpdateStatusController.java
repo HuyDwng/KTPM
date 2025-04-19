@@ -1,4 +1,4 @@
-package com.bttb.bttb;
+package com.bttb.controller;
 
 import com.bttb.pojo.Device;
 import com.bttb.services.DeviceServices;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Update_statusController {
+public class UpdateStatusController {
 
     @FXML
     private ComboBox<Device> cbDevice; // Chọn thiết bị
@@ -26,14 +26,14 @@ public class Update_statusController {
     private Button btnConfirm;
 
     private DeviceServices deviceService;
-    private Device_managementController deviceManagementController;
+    private DeviceManagementController deviceManagementController;
 
     public void setDeviceService(DeviceServices service) throws SQLException {
         this.deviceService = service;
         loadDeviceList();
     }
 
-    public void setDeviceManagementController(Device_managementController controller) {
+    public void setDeviceManagementController(DeviceManagementController controller) {
         this.deviceManagementController = controller;
     }
 
@@ -76,7 +76,7 @@ public class Update_statusController {
                     try {
                         deviceManagementController.loadDeviceData();
                     } catch (SQLException ex) {
-                        Logger.getLogger(Update_statusController.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(UpdateStatusController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
                 closeWindow();

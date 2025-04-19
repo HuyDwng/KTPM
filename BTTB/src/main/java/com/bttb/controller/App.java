@@ -1,4 +1,4 @@
-package com.bttb.bttb;
+package com.bttb.controller;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +17,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("login"));
+        scene = new Scene(loadFXML("device_management"));
         stage.setScene(scene);
         stage.sizeToScene(); //update size theo fxml
         stage.setResizable(false);
@@ -32,7 +32,7 @@ public class App extends Application {
     }
 
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/com/bttb/bttb/" + fxml + ".fxml"));
         return fxmlLoader.load();
     }
 
