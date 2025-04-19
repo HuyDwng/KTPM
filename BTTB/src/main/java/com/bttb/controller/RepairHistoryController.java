@@ -1,4 +1,4 @@
-package com.bttb.bttb;
+package com.bttb.controller;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;

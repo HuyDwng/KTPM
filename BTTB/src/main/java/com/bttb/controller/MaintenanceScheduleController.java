@@ -1,4 +1,4 @@
-package com.bttb.bttb;
+package com.bttb.controller;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.EmailUtils;
@@ -112,7 +112,7 @@ public class MaintenanceScheduleController implements Initializable {
                 Logger.getLogger(MaintenanceScheduleController.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        
+
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab == tabManagement) {
                 lblMessage.setVisible(false);
@@ -543,7 +543,7 @@ public class MaintenanceScheduleController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-  
+
     public static void showUpcomingMaintenance(List<MaintenanceSchedule> schedules, int daysAhead) {
         List<MaintenanceSchedule> upcoming = getUpcomingSchedules(schedules, daysAhead);
 
@@ -578,6 +578,21 @@ public class MaintenanceScheduleController implements Initializable {
         alert.setHeaderText("Có " + upcoming.size() + " thiết bị cần bảo trì trong " + daysAhead + " ngày tới");
         alert.getDialogPane().setContent(textArea);
         alert.show();
+    }
+
+    public static String buildMaintenanceAlertContent(List<MaintenanceSchedule> schedules) {
+        if (schedules == null || schedules.isEmpty()) {
+            return "";
+        }
+        StringBuilder content = new StringBuilder("Maintenance Alert:\n");
+        for (MaintenanceSchedule schedule : schedules) {
+            content.append("Device: ").append(schedule.getDeviceName())
+                    .append(", Người thực hiện: ").append(schedule.getExecutorName())
+                    .append(", Ngày: ").append(schedule.getLastMaintenanceDate())
+                    .append(", Lúc: ").append(schedule.getScheduledTime())
+                    .append("\n");
+        }
+        return content.toString();
     }
 
     public static List<MaintenanceSchedule> getUpcomingSchedules(List<MaintenanceSchedule> schedules, int daysAhead) {

@@ -1,6 +1,6 @@
 package com.bttb.services;
 
-import com.bttb.bttb.Device_managementController;
+import com.bttb.controller.DeviceManagementController;
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
 import java.sql.Connection;
@@ -19,10 +19,10 @@ import javafx.collections.ObservableList;
  */
 public class DeviceServices {
 
-    private Device_managementController controller;
+    private DeviceManagementController controller;
 
     // Constructor để truyền controller từ bên ngoài
-    public DeviceServices(Device_managementController controller) {
+    public DeviceServices(DeviceManagementController controller) {
         this.controller = controller;
     }
 

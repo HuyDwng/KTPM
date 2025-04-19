@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
  */
-package com.bttb.bttb;
+package com.bttb.controller;
 
 import com.bttb.pojo.Device;
 import com.bttb.services.DeviceServices;
@@ -35,7 +35,7 @@ import javafx.stage.Stage;
  *
  * @author nhanh
  */
-public class Device_managementController implements Initializable {
+public class DeviceManagementController implements Initializable {
 
     /**
      * Initializes the controller class.
@@ -68,7 +68,7 @@ public class Device_managementController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/bttb/bttb/add_device.fxml"));
             Parent root = loader.load();
 
-            Add_deviceController addDeviceController = loader.getController();
+            AddDeviceController addDeviceController = loader.getController();
             addDeviceController.setDeviceManagementController(this);
 
             Stage stage = new Stage();
@@ -167,7 +167,7 @@ public class Device_managementController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("update_status.fxml"));
             Parent root = loader.load();
 
-            Update_statusController controller = loader.getController();
+            UpdateStatusController controller = loader.getController();
             controller.setDeviceService(new DeviceServices());
             controller.setDeviceManagementController(this);
 
@@ -203,7 +203,7 @@ public class Device_managementController implements Initializable {
                     try {
                         loadDeviceData(); // Tải lại dữ liệu thiết bị
                     } catch (SQLException ex) {
-                        Logger.getLogger(Device_managementController.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(DeviceManagementController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else {
                     showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể xóa thiết bị!");
@@ -233,7 +233,7 @@ public class Device_managementController implements Initializable {
         filteredDeviceList.clear();
 
         for (Device device : allDeviceList) {
-            boolean matchesName = device.getName().toLowerCase().contains(searchText);
+            boolean matchesName = device.getName().toLowerCase().contains(searchText.toLowerCase());
             boolean matchesStatus = selectedStatus.equals("Tất cả") || device.getStatus().equals(selectedStatus);
 
             if (matchesName && matchesStatus) {
@@ -275,7 +275,7 @@ public class Device_managementController implements Initializable {
         try {
             loadDeviceData();
         } catch (SQLException ex) {
-            Logger.getLogger(Device_managementController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DeviceManagementController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
