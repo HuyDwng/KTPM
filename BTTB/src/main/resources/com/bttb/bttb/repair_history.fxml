@@ -16,8 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane prefHeight="581.0" prefWidth="964.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.controller.RepairHistoryController">
-
+<BorderPane prefHeight="581.0" prefWidth="964.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.RepairHistoryController">
     <!-- Header -->
     <top>
         <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px;" text="Quản lý lịch sửa chữa" />
