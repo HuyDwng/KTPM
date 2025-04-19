@@ -5,7 +5,6 @@
 package com.bttb.controller;
 
 import com.bttb.pojo.MaintenanceSchedule;
-import com.bttb.pojo.User;
 import com.bttb.services.ScheduleServices;
 import java.io.IOException;
 import java.net.URL;
@@ -24,7 +23,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 /**

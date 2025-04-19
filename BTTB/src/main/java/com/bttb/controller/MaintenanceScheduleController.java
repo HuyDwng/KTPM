@@ -3,7 +3,7 @@ package com.bttb.controller;
 import com.bttb.pojo.Device;
 import com.bttb.pojo.EmailUtils;
 import com.bttb.pojo.MaintenanceSchedule;
-import com.bttb.pojo.User;
+import com.bttb.pojo.Users;
 import com.bttb.services.ScheduleServices;
 import java.net.URL;
 import java.sql.SQLException;
@@ -45,7 +45,7 @@ public class MaintenanceScheduleController implements Initializable {
     @FXML
     private ComboBox<String> comboBoxFrequency;
     @FXML
-    private ComboBox<User> comboBoxExecutor;
+    private ComboBox<Users> comboBoxExecutor;
     @FXML
     private DatePicker datePicker;
     @FXML
@@ -289,7 +289,7 @@ public class MaintenanceScheduleController implements Initializable {
     }
 
     public void loadExecutors() {
-        ObservableList<User> executors = ss.loadExecutors();
+        ObservableList<Users> executors = ss.loadExecutors();
         comboBoxExecutor.setItems(executors);
     }
 
@@ -304,7 +304,7 @@ public class MaintenanceScheduleController implements Initializable {
         LocalDate maintenancePeriod = deadlinePicker.getValue();
         LocalTime selectedTime = LocalTime.parse(txtTime.getText());
         String selectedFrequency = comboBoxFrequency.getSelectionModel().getSelectedItem();
-        User selectedUser = (User) comboBoxExecutor.getValue();
+        Users selectedUser = (Users) comboBoxExecutor.getValue();
         int executorId = selectedUser.getId();
         String executorName = selectedUser.toString();
 

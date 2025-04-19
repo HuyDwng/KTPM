@@ -4,9 +4,9 @@
  */
 package com.bttb.controller;
 
-import com.bttb.pojo.User;
+import com.bttb.pojo.Users;
 import com.bttb.services.HashUtils;
-import com.bttb.services.UserServices;
+import com.bttb.services.UsersServices;
 import com.bttb.services.Utils;
 import java.net.URL;
 import java.sql.SQLException;
@@ -51,7 +51,7 @@ public class LoginController implements Initializable {
         roleComboBox.getItems().addAll("admin", "technician");
         roleComboBox.setEditable(false); // Không cho nhập tay
     }
-    private UserServices us = new UserServices();
+    private UsersServices us = new UsersServices();
 
     @FXML
     private void login(ActionEvent event) {
@@ -65,13 +65,12 @@ public class LoginController implements Initializable {
         }
 
         try {
-            User user = us.getUserByUsernameAndRole(username, role);
+            Users user = us.getUsersByUsernameAndRole(username, role);
 
             if (user != null && HashUtils.checkPassword(password, user.getPassword())) {
                 // Đăng nhập thành công
 
-                User.currentUser = user; // 
-                System.out.println(user.getRole());
+                Users.currentUser = user; // 
                 if ("technician".equals(user.getRole())) {
                     showErrorWithTimeout("Kỹ thuật viên chưa được hỗ trợ!");
                 } else {

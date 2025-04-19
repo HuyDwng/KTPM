@@ -4,11 +4,11 @@ import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
 import com.bttb.pojo.RepairHistory;
 import com.bttb.pojo.RepairIssue;
-import com.bttb.pojo.User;
+import com.bttb.pojo.Users;
 import com.bttb.services.DeviceServices;
 import com.bttb.services.RepairHistoryServices;
 import com.bttb.services.RepairIssueServices;
-import com.bttb.services.UserServices;
+import com.bttb.services.UsersServices;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -60,7 +60,7 @@ public class RepairHistoryController implements Initializable {
     @FXML
     private TextField txtTime;
     @FXML
-    private ComboBox<User> comboBoxTechnician;
+    private ComboBox<Users> comboBoxTechnician;
 
     @FXML
     private ComboBox<String> comboBoxDevice;
@@ -78,7 +78,7 @@ public class RepairHistoryController implements Initializable {
     private TableColumn<RepairIssue, Double> costColumn;
 
     private final RepairHistoryServices repairHistoryService = new RepairHistoryServices();
-    private final UserServices userServices = new UserServices();
+    private final UsersServices usersServices = new UsersServices();
     private final DeviceServices deviceServices = new DeviceServices();
     private final RepairIssueServices repairIssueServices = new RepairIssueServices();
 
@@ -105,7 +105,7 @@ public class RepairHistoryController implements Initializable {
 
     private void loadTechnicians() {
         try {
-            List<User> techList = userServices.getTechniciansListUser();
+            List<Users> techList = usersServices.getTechniciansListUsers();
 
             comboBoxTechnician.setItems(FXCollections.observableArrayList(techList));
             comboBoxTechnician.setEditable(false); // Ngăn không cho gõ
@@ -290,8 +290,8 @@ public class RepairHistoryController implements Initializable {
 
     @FXML
     private void handleAddRepairHistory() throws SQLException {
-        // Kỹ thuật viên (User object)
-        User selectedTech = comboBoxTechnician.getSelectionModel().getSelectedItem();
+        // Kỹ thuật viên (Users object)
+        Users selectedTech = comboBoxTechnician.getSelectionModel().getSelectedItem();
         int technicianId = selectedTech != null ? selectedTech.getId() : -1;
         String technicianName = selectedTech != null ? selectedTech.getName() : null;
         LocalTime selectedTime = LocalTime.parse(txtTime.getText());
