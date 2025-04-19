@@ -1,6 +1,6 @@
 package com.bttb.services;
 
-import com.bttb.bttb.Device_managementController;
+import com.bttb.controller.Device_managementController;
 import com.bttb.pojo.Device;
 import com.bttb.pojo.JdbcUtils;
 import java.sql.Connection;
