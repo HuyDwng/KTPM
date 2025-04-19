@@ -1,26 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.bttb.pojo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- *
- * @author LEGION
- */
 public class JdbcUtils {
+
     static {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            // Load cả driver MySQL và H2 (an toàn)
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException ex) {
         }
     }
-    
+
     public static Connection getConn() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/bttb", "root", "huyduong2004");
+        String isTest = System.getProperty("test.mode");
+
+        if ("true".equals(isTest)) {
+            // 🔹 Kết nối H2 khi test
+            return DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1", "sa", "");
+        }
+
+        // 🔹 Kết nối MySQL khi chạy thật
+        return DriverManager.getConnection("jdbc:mysql://localhost/bttbdb", "root", "huyduong2004");
     }
 }

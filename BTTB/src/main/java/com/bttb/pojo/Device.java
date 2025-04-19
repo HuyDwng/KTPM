@@ -4,16 +4,35 @@
  */
 package com.bttb.pojo;
 
-/**
- *
- * @author LEGION
- */
 public class Device {
-
     private int id;
     private String name;
     private String status;
+    private int deviceTypeId;
+    private String deviceTypeName; 
 
+    public Device(int id, String name, String status, String deviceTypeName) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.deviceTypeName = deviceTypeName;
+    }
+
+    
+    public String getDeviceTypeName() {
+        return deviceTypeName;
+    }
+
+    public void setDeviceTypeName(String deviceTypeName) {
+        this.deviceTypeName = deviceTypeName;
+    }
+
+    public Device(String name, String status, int deviceTypeId) {
+        this.name = name;
+        this.status = status;
+        this.deviceTypeId = deviceTypeId;
+    }
+    
     public Device() {
     }
 
@@ -25,12 +44,21 @@ public class Device {
 
     @Override
     public String toString() {
-        return String.format("ID: %d - %s", this.id, this.name);
+        return id + " - " + name;
     }
-
-    /**
-     * @return the id
-     */
+    
+    public Device(String name, String status) {
+        this.name = name;
+        this.status = status;
+    }
+    
+//     public Device(int id, String name, String status, int deviceTypeId) {
+//        this.id = id;
+//        this.name = name;
+//        this.status = status;
+//        this.deviceTypeId = deviceTypeId;
+//    }
+  
     public int getId() {
         return id;
     }
@@ -48,14 +76,12 @@ public class Device {
     public String getName() {
         return name;
     }
-
     /**
      * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
     }
-
     /**
      * @return the status
      */
@@ -69,4 +95,18 @@ public class Device {
     public void setStatus(String status) {
         this.status = status;
     }
-}
+
+    /**
+     * @return the deviceTypeId
+     */
+    public int getDeviceTypeId() {
+        return deviceTypeId;
+    }
+
+    /**
+     * @param deviceTypeId the deviceTypeId to set
+     */
+    public void setDeviceTypeId(int deviceTypeId) {
+        this.deviceTypeId = deviceTypeId;
+    }
+}   

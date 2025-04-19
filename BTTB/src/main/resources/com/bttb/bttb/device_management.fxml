@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bttb.bttb.Device_managementController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.bttb.bttb.Device_managementController">
 
     <!-- Header -->
     <top>
-        <HBox spacing="10">
-            <Label text="Quản lý thiết bị" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        <HBox alignment="CENTER" prefHeight="38.0" prefWidth="662.0" spacing="10">
+            <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Quản lý thiết bị">
+            <HBox.margin>
+               <Insets left="10.0" />
+            </HBox.margin></Label>
             <Region HBox.hgrow="ALWAYS" />
             <TextField fx:id="searchField" promptText="Tìm kiếm thiết bị..." />
-            
             <ComboBox fx:id="statusFilter" />
-            
-            <Button fx:id="btnSearch" text="Tìm kiếm" />
+            <Button fx:id="btnSearch" onAction="#onSearchChanged" text="Tìm kiếm">
+            <HBox.margin>
+               <Insets right="10.0" />
+            </HBox.margin></Button>
         </HBox>
     </top>
 
@@ -26,10 +34,10 @@
     <center>
         <TableView fx:id="deviceTable">
             <columns>
-                <TableColumn text="Mã thiết bị" fx:id="colDeviceId"/>
-                <TableColumn text="Tên thiết bị" fx:id="colDeviceName"/>
-                <TableColumn text="Trạng thái" fx:id="colStatus"/>
-                <TableColumn text="Vị trí" fx:id="colLocation"/>
+                <TableColumn fx:id="colDeviceId" prefWidth="91.99996644258499" text="Mã thiết bị" />
+                <TableColumn fx:id="colDeviceName" prefWidth="299.20001220703125" text="Tên thiết bị" />
+                <TableColumn fx:id="colStatus" minWidth="0.0" prefWidth="141.60003662109375" text="Trạng thái" />
+                <TableColumn fx:id="colType" prefWidth="131.20004882812498" text="Loại thiết bị" />
             </columns>
         </TableView>
     </center>
@@ -37,11 +45,21 @@
     <!-- Footer -->
     <bottom>
         <HBox spacing="10">
-            <Button fx:id="btnAddDevice" text="Thêm thiết bị" />
-            <Button fx:id="btnUpdateStatus" text="Cập nhật trạng thái" />
-            <Button fx:id="btnDeleteDevice" text="Xóa thiết bị" />
+            <Button fx:id="btnAddDevice" onAction="#openAddDeviceWindow" text="Thêm thiết bị">
+            <HBox.margin>
+               <Insets bottom="10.0" left="10.0" top="10.0" />
+            </HBox.margin></Button>
+            
+            <Button fx:id="btnUpdateStatus" onAction="#openUpdateStatusForm" text="Cập nhật trạng thái">
+            <HBox.margin>
+               <Insets top="10.0" />
+            </HBox.margin></Button>
+           
+            <Button fx:id="btnDeleteDevice" onAction="#deleteDevice" text="Xóa thiết bị">
+            <HBox.margin>
+               <Insets top="10.0" />
+            </HBox.margin></Button>
         </HBox>
     </bottom>
 
 </BorderPane>
-
