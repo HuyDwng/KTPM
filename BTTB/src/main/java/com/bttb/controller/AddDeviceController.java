@@ -1,4 +1,4 @@
-package com.bttb.bttb;
+package com.bttb.controller;
 
 import com.bttb.pojo.Device;
 import com.bttb.pojo.DeviceType;
@@ -12,7 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class Add_deviceController {
+public class AddDeviceController {
 
     @FXML
     private TextField txtName;
@@ -24,7 +24,7 @@ public class Add_deviceController {
     private DeviceServices deviceService;
     private DeviceTypeServices deviceTypeServices;
 
-    public void setDeviceManagementController(Device_managementController controller) {
+    public void setDeviceManagementController(DeviceManagementController controller) {
         this.deviceService = new DeviceServices(controller);
         this.deviceTypeServices = new DeviceTypeServices();
     }
